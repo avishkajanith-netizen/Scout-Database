@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scout Database System</title>
+<style>
+body{font-family:Arial;background:#f4f6f8;padding:20px}
+.container{max-width:1100px;margin:auto;background:#fff;padding:20px;border-radius:8px}
+input,select,button{padding:8px;width:100%;margin-bottom:10px}
+button{background:#2563eb;color:#fff;border:none;border-radius:4px;cursor:pointer}
+.hidden{display:none}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th,td{border:1px solid #ddd;padding:8px}
+th{background:#f1f5f9}
+.admin-only{background:#fee2e2}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="container" id="loginBox">
+<h2>Login</h2>
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<p>Admin: admin / admin123<br>Entry: entry / entry123</p>
+</div>
+
+<!-- DASHBOARD -->
+<div class="container hidden" id="dashboard">
+<h2>Scout Database</h2>
+<p>Logged in as: <b id="roleText"></b> <button onclick="logout()">Logout</button></p>
+
+<h3>Add Scout</h3>
+<input id="s_reg" placeholder="Registration No">
+<input id="s_name" placeholder="Scout Name">
+<input id="s_troop" placeholder="Troop">
+<input id="s_dob" type="date">
+<button onclick="addScout()">Save Scout</button>
+
+<h3>Update Badge</h3>
+<input id="b_reg" placeholder="Registration No">
+<select id="b_name">
+  <option value="">Select Badge</option>
+  <option>President Award</option>
+  <option>PM Award</option>
+  <option>CC Challenge Award</option>
+  <option>CC Award</option>
+  <option>Scout Award</option>
+  <option>Membership</option>
+  <!-- J Series -->
+  <option>JA/01</option>
+  <option>JA/02</option>
+  <option>JA/03</option>
+  <option>JA/04</option>
+  <option>JA/05</option>
+  <option>JA/06</option>
+  <option>JA/07</option>
+  <option>JA/08</option>
+  <option>JA/09</option>
+  <option>JA/10</option>
+
+  <option>JB/01</option>
+  <option>JB/02</option>
+  <option>JB/03</option>
+  <option>JB/04</option>
+  <option>JB/05</option>
+
+  <option>JC/01</option>
+  <option>JC/02</option>
+  <option>JC/03</option>
+  <option>JC/04</option>
+
+  <option>JD/01</option>
+  <option>JD/02</option>
+  <option>JD/03</option>
+  <option>JD/04</option>
+
+  <option>JE/01</option>
+
+  <option>JF/01</option>
+  <option>JF/02</option>
+  <option>JF/03</option>
+  <option>JF/04</option>
+  <option>JF/05</option>
+
+  <option>JG/01</option>
+  <option>JG/02</option>
+  <option>JG/03</option>
+  <option>JG/04</option>
+  <option>JG/05</option>
+
+  <option>JH/01</option>
+  <option>JH/02</option>
+  <option>JH/03</option>
+  <option>JH/04</option>
+  <option>JH/05</option>
+  <option>JH/06</option>
+
+  <option>JI/01</option>
+  <option>JI/02</option>
+  <option>JI/03</option>
+
+  <option>JJ/01</option>
+  <option>JJ/02</option>
+  <option>JJ/03</option>
+  <option>JJ/04</option>
+
+  <option>JK/01</option>
+  <option>JK/02</option>
+  <option>JK/03</option>
+
+  <option>JL/01</option>
+  <option>JL/02</option>
+
+  <option>JM/01</option>
+
+  <option>JN/01</option>
+  <option>JN/02</option>
+
+  <option>JW/01</option>
+  <option>JW/02</option>
+  <option>JW/03</option>
+  <option>JW/04</option>
+  <option>JW/05</option>
+  <option>JW/06</option>
+
+  <!-- S Series -->
+  <option>SA/01</option>
+  <option>SA/02</option>
+  <option>SA/03</option>
+  <option>SA/04</option>
+  <option>SA/05</option>
+  <option>SA/06</option>
+  <option>SA/07</option>
+  <option>SA/08</option>
+  <option>SA/09</option>
+  <option>SA/10</option>
+  <option>SA/11</option>
+  <option>SA/12</option>
+
+  <option>SB/01</option>
+  <option>SB/02</option>
+  <option>SB/03</option>
+  <option>SB/04</option>
+  <option>SB/05</option>
+  <option>SB/06</option>
+
+  <option>SC/01</option>
+  <option>SC/02</option>
+  <option>SC/03</option>
+  <option>SC/04</option>
+  <option>SC/05</option>
+
+  <option>SD/01</option>
+  <option>SD/02</option>
+  <option>SD/03</option>
+  <option>SD/04</option>
+  <option>SD/05</option>
+
+  <option>SE/01</option>
+  <option>SE/02</option>
+
+  <option>SF/01</option>
+  <option>SF/02</option>
+  <option>SF/03</option>
+  <option>SF/04</option>
+  <option>SF/05</option>
+
+  <option>SG/01</option>
+  <option>SG/02</option>
+  <option>SG/03</option>
+  <option>SG/04</option>
+  <option>SG/05</option>
+  <option>SG/06</option>
+
+  <option>SH/01</option>
+  <option>SH/02</option>
+  <option>SH/03</option>
+  <option>SH/04</option>
+  <option>SH/05</option>
+  <option>SH/06</option>
+  <option>SH/07</option>
+
+  <option>SI/01</option>
+  <option>SI/02</option>
+  <option>SI/03</option>
+
+  <option>SJ/01</option>
+  <option>SJ/02</option>
+  <option>SJ/03</option>
+  <option>SJ/04</option>
+  <option>SJ/05</option>
+
+  <option>SK/01</option>
+  <option>SK/02</option>
+  <option>SK/03</option>
+  <option>SK/04</option>
+  <option>SK/05</option>
+
+  <option>SL/01</option>
+  <option>SL/02</option>
+
+  <option>SM/01</option>
+  <option>SM/02</option>
+
+  <option>SW/01</option>
+  <option>SW/02</option>
+  <option>SW/03</option>
+  <option>SW/04</option>
+  <option>SW/05</option>
+  <option>SW/06</option>
+</select>
+<input type="date" id="b_date">
+<button onclick="addBadge()">Add Badge</button>
+
+<h3>Search Scout</h3>
+<input id="search" placeholder="Enter Registration No" onkeyup="render()">
+
+<table>
+<thead>
+<tr>
+<th>Reg No</th><th>Name</th><th>DoB</th><th>Troop</th><th>Badges</th><th class="admin-only">Admin</th>
+</tr>
+</thead>
+<tbody id="table"></tbody>
+</table>
+</div>
+
+<script>
+/* ===== USERS ===== */
+const users = {
+  admin: { password: "admin123", role: "admin" },
+  entry: { password: "entry123", role: "entry" }
+};
+
+let currentUser = null;
+let scouts = JSON.parse(localStorage.getItem("scouts") || "[]");
+
+/* ===== LOGIN ===== */
+function login() {
+  const u = document.getElementById("username").value;
+  const p = document.getElementById("password").value;
+
+  if (users[u] && users[u].password === p) {
+    currentUser = users[u];
+    document.getElementById("loginBox").classList.add("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
+    document.getElementById("roleText").innerText = currentUser.role;
+    render();
+  } else {
+    alert("Invalid login");
+  }
+}
+
+/* ===== LOGOUT ===== */
+function logout() {
+  currentUser = null;
+  document.getElementById("loginBox").classList.remove("hidden");
+  document.getElementById("dashboard").classList.add("hidden");
+}
+
+/* ===== SAVE ===== */
+function save() {
+  localStorage.setItem("scouts", JSON.stringify(scouts));
+}
+
+/* ===== ADD SCOUT ===== */
+function addScout() {
+  const reg = document.getElementById("s_reg").value;
+  if (!reg) return alert("Enter Registration No");
+  if (scouts.find(s => s.reg === reg)) {
+    alert("Scout already exists");
+    return;
+  }
+
+  scouts.push({
+    reg: reg,
+    name: document.getElementById("s_name").value,
+    dob: document.getElementById("s_dob").value,
+    troop: document.getElementById("s_troop").value,
+    badges: []
+  });
+
+  save();
+  render();
+}
+
+/* ===== ADD BADGE ===== */
+function addBadge() {
+  const reg = document.getElementById("b_reg").value;
+  const scout = scouts.find(s => s.reg === reg);
+  if (!scout) {
+    alert("Scout not found");
+    return;
+  }
+
+  scout.badges.push({
+    name: document.getElementById("b_name").value,
+    date: document.getElementById("b_date").value
+  });
+
+  save();
+  render();
+}
+
+/* ===== EDIT SCOUT ===== */
+function editScout(reg) {
+  if(currentUser.role !== "admin") return;
+  const s = scouts.find(x => x.reg === reg);
+  if (!s) return;
+
+  s.name  = prompt("Scout Name:", s.name) || s.name;
+  s.troop = prompt("Troop:", s.troop) || s.troop;
+  s.dob   = prompt("DOB (YYYY-MM-DD):", s.dob) || s.dob;
+
+  save();
+  render();
+}
+
+/* ===== EDIT BADGE ===== */
+function editBadge(reg, index) {
+  if(currentUser.role !== "admin") return;
+  const s = scouts.find(x => x.reg === reg);
+  if (!s) return;
+
+  const badge = s.badges[index];
+  const newName = prompt("Badge Name:", badge.name);
+  const newDate = prompt("Badge Date (YYYY-MM-DD):", badge.date);
+
+  if (newName) badge.name = newName;
+  if (newDate) badge.date = newDate;
+
+  save();
+  render();
+}
+
+/* ===== DELETE BADGE ===== */
+function deleteBadge(reg, index) {
+  if(currentUser.role !== "admin") return;
+  const s = scouts.find(x => x.reg === reg);
+  if (!s) return;
+
+  if (confirm("Remove this badge?")) {
+    s.badges.splice(index, 1);
+    save();
+    render();
+  }
+}
+
+/* ===== DELETE SCOUT ===== */
+function deleteScout(reg) {
+  if(currentUser.role !== "admin") return;
+  if (confirm("Delete this scout completely?")) {
+    scouts = scouts.filter(s => s.reg !== reg);
+    save();
+    render();
+  }
+}
+
+/* ===== RENDER TABLE ===== */
+function render() {
+  const table = document.getElementById("table");
+  table.innerHTML = "";
+  const q = document.getElementById("search").value || "";
+
+  scouts
+    .filter(s => s.reg.includes(q))
+    .forEach(s => {
+
+      let badgeHTML = s.badges.map((b, i) =>
+        currentUser.role === "admin"
+          ? `${b.name} (${b.date}) <button onclick="editBadge('${s.reg}',${i})">✏️</button> <button onclick="deleteBadge('${s.reg}',${i})">❌</button>`
+          : `${b.name} (${b.date})`
+      ).join("<br>");
+
+      table.innerHTML += `
+      <tr>
+        <td>${s.reg}</td>
+        <td>${s.name}</td>
+        <td>${s.dob}</td>
+        <td>${s.troop}</td>
+        <td>${badgeHTML}</td>
+        <td class="admin-only">
+          ${currentUser.role === "admin"
+            ? `<button onclick="editScout('${s.reg}')">Edit Scout</button>
+               <button onclick="deleteScout('${s.reg}')">Delete Scout</button>`
+            : ""}
+        </td>
+      </tr>`;
+    });
+}
+</script>
+</body>
+</html>
