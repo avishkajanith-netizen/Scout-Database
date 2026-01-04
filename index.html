@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scout Database - Pro Edition</title>
+<title>Scout Database - Pro Master</title>
 <style>
-  body{font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f6f8; padding:20px; color: #333;}
-  .container{max-width:1200px; margin:auto; background:#fff; padding:25px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.08)}
+  :root { --primary: #2563eb; --secondary: #8b5cf6; --danger: #ef4444; --bg: #f4f6f8; }
+  body{font-family:'Segoe UI', Tahoma, sans-serif; background:var(--bg); padding:20px; color: #333;}
+  .container{max-width:1300px; margin:auto; background:#fff; padding:25px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.08)}
   
-  /* Inputs & Buttons */
+  /* Form Elements */
   input, select, button { padding:12px; width:100%; margin-bottom:12px; border:1px solid #ddd; border-radius:6px; box-sizing:border-box; font-size: 14px; }
-  button { background:#2563eb; color:#fff; border:none; cursor:pointer; font-weight:600; transition: 0.3s; }
-  button:hover { background:#1d4ed8; }
-  .btn-danger { background:#ef4444; }
-  .btn-danger:hover { background:#dc2626; }
+  button { background:var(--primary); color:#fff; border:none; cursor:pointer; font-weight:600; display:flex; align-items:center; justify-content:center; gap:8px; }
+  button:hover { opacity: 0.9; }
+  .btn-danger { background:var(--danger); }
   .btn-secondary { background:#64748b; }
 
   /* Layout */
@@ -21,38 +21,43 @@
   .box { background:#f8fafc; padding:20px; border-radius:10px; border:1px solid #e2e8f0; }
   .hidden { display:none; }
 
-  /* Tabs */
-  .tab-group { display: flex; gap: 10px; margin-bottom: 10px; }
-  .tab-btn { flex: 1; background: #e2e8f0; color: #475569; padding: 10px; cursor: pointer; border-radius: 6px; text-align: center; font-size: 13px; font-weight: bold; }
-  .tab-btn.active { background: #8b5cf6; color: white; }
+  /* Filters */
+  .filter-group { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .filter-btn { background: #fff; border: 1px solid #ddd; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 13px; transition: 0.3s; width: auto; }
+  .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-  /* Table & Badges */
-  table { width:100%; border-collapse:collapse; margin-top:20px; background: white; }
-  th, td { border:1px solid #edf2f7; padding:15px; text-align:left; }
-  th { background:#f1f5f9; font-weight: 600; }
+  /* Badges & Selection */
+  .tab-group { display: flex; gap: 5px; margin-bottom: 10px; }
+  .tab-btn { flex: 1; background: #e2e8f0; padding: 10px; cursor: pointer; border-radius: 6px; text-align: center; font-size: 12px; font-weight: bold; }
+  .tab-btn.active { background: var(--secondary); color: white; }
+  #award_name_badge { height: 120px; }
+
+  /* Table */
+  table { width:100%; border-collapse:collapse; background: white; border-radius: 8px; overflow: hidden; }
+  th, td { border:1px solid #edf2f7; padding:12px; text-align:left; }
+  th { background:#f8fafc; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
   
-  .badge-tag { padding:5px 10px; border-radius:6px; font-size:12px; display:inline-block; margin:3px; position: relative; border: 1px solid transparent; }
+  .badge-tag { padding:4px 8px; border-radius:4px; font-size:11px; display:inline-block; margin:2px; border: 1px solid transparent; line-height: 1.2;}
   .type-badge { background:#ebf5ff; color:#1e40af; border-color: #bfdbfe; }
   .type-award { background:#fef3c7; color:#92400e; border-color: #fde68a; font-weight: bold; }
-  .date-sub { display: block; font-size: 10px; opacity: 0.8; margin-top: 2px; border-top: 1px solid rgba(0,0,0,0.1); }
+  .date-sub { display: block; font-size: 9px; opacity: 0.8; margin-top: 2px; border-top: 1px solid rgba(0,0,0,0.1); }
   
-  .admin-edit-hint { cursor: pointer; border: 1px dashed #2563eb; }
-  .admin-edit-hint:hover { transform: scale(1.05); }
+  .admin-clickable { cursor: pointer; border: 1px dashed var(--primary); }
+  .admin-clickable:hover { background: #dbeafe; }
 
-  /* Modals */
+  /* Modal */
   .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:1000; }
-  .modal-content { background:white; padding:30px; border-radius:12px; width:400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+  .modal-content { background:white; padding:25px; border-radius:12px; width:400px; }
 
   @media print {
     .no-print { display: none !important; }
-    body { background: white; padding: 0; }
-    .container { box-shadow: none; border: none; width: 100%; }
+    #printArea { display: block !important; }
   }
 </style>
 </head>
 <body>
 
-<div id="loginPage" class="container" style="max-width: 400px; margin-top: 100px;">
+<div id="loginPage" class="container" style="max-width: 400px; margin-top: 80px;">
   <h2 style="text-align:center">Scout Database Login</h2>
   <input id="user" placeholder="Username (admin / entry)">
   <input id="pass" type="password" placeholder="Password">
@@ -61,202 +66,165 @@
 
 <div id="mainDashboard" class="container hidden">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-    <h2>Scout Management Dashboard</h2>
-    <button onclick="location.reload()" class="btn-danger" style="width: auto;">Logout</button>
+    <h2>Scout System <small id="roleDisplay" style="font-size:12px; color:gray"></small></h2>
+    <button onclick="location.reload()" class="btn-danger" style="width:auto">Logout</button>
   </div>
 
   <div class="grid no-print">
     <div class="box">
-      <h3>1. Register New Scout</h3>
-      <input id="reg_id" placeholder="Registration No">
+      <h3>1. Register Scout</h3>
+      <input id="reg_id" placeholder="Reg No (Unique ID)">
       <input id="reg_name" placeholder="Full Name">
-      <select id="reg_section">
-        <option value="">-- Select Section --</option>
-        <option>Sigithi Scout</option><option>Cub Scout</option>
-        <option>Scout</option><option>Rover Scout</option>
+      <select id="reg_section_input">
+        <option>Sigithi Scout</option><option>Cub Scout</option><option>Scout</option><option>Rover Scout</option>
       </select>
       <input id="reg_troop" placeholder="Troop Name">
       <input id="reg_dob" type="date">
-      <button onclick="registerScout()">+ Save Profile</button>
+      <button onclick="registerScout()">💾 Save Profile</button>
     </div>
 
     <div class="box">
-      <h3>2. Award Badge / Award</h3>
-      <input id="award_reg" placeholder="Enter Scout Reg No">
-      
+      <h3>2. Award Badge</h3>
+      <input id="award_reg" placeholder="Scout Reg No">
       <div class="tab-group">
-        <div id="tabB" class="tab-btn active" onclick="setAwardType('badge')">Proficiency Badges</div>
-        <div id="tabA" class="tab-btn" onclick="setAwardType('award')">Core Awards</div>
+        <div id="tabB" class="tab-btn active" onclick="setAwardTab('badge')">Badges</div>
+        <div id="tabA" class="tab-btn" onclick="setAwardTab('award')">Core Awards</div>
       </div>
-
-      <select id="award_name_badge">
-          <option value="">-- Select Badge Code --</option>
-          <optgroup label="Junior">
-              <option>J.A./01</option><option>J.A./02</option><option>J.A./03</option><option>J.A./04</option>
-          </optgroup>
-          <optgroup label="Senior">
-              <option>S.A./01</option><option>S.A./02</option><option>S.A./03</option><option>S.A./04</option>
-          </optgroup>
-      </select>
-      
+      <div id="badgeSelector">
+        <input id="badgeSearch" placeholder="🔍 Search Badge Code..." onkeyup="filterBadgeOptions()">
+        <select id="award_name_badge" size="5"></select>
+      </div>
       <select id="award_name_core" class="hidden">
-          <option value="">-- Select Core Award --</option>
-          <option>Membership Badge</option><option>Bronze Award</option>
-          <option>Silver Award</option><option>Gold Award</option>
-          <option>President Award</option>
+          <option>Membership Badge</option><option>Bronze Award</option><option>Silver Award</option><option>Gold Award</option><option>President Award</option>
       </select>
-
       <input type="date" id="award_date">
-      <button onclick="addAwardToScout()" style="background:#8b5cf6">🎖️ Update Record</button>
+      <button onclick="awardScout()" style="background:var(--secondary)">🏅 Award Now</button>
     </div>
   </div>
 
-  <hr class="no-print">
-  
-  <div class="no-print" style="margin-top: 20px;">
-    <input id="searchBar" placeholder="🔍 Search by Name or Reg No..." onkeyup="renderTable()">
+  <div class="filter-group no-print">
+    <button class="filter-btn active" onclick="setFilter('All', this)">All Sections</button>
+    <button class="filter-btn" onclick="setFilter('Sigithi Scout', this)">Sigithi</button>
+    <button class="filter-btn" onclick="setFilter('Cub Scout', this)">Cub</button>
+    <button class="filter-btn" onclick="setFilter('Scout', this)">Scout</button>
+    <button class="filter-btn" onclick="setFilter('Rover Scout', this)">Rover</button>
   </div>
 
-  <table id="scoutTable">
+  <input id="mainSearch" class="no-print" placeholder="🔍 Search by Name or Reg No..." onkeyup="renderTable()">
+  
+  <table id="mainTable">
     <thead>
       <tr>
         <th>Reg No</th>
-        <th>Basic Info</th>
-        <th>Badges & Awards (Click to Edit)</th>
-        <th class="no-print">Print</th>
+        <th>Details</th>
+        <th>Badges (Click to Edit)</th>
+        <th class="no-print">Actions</th>
       </tr>
     </thead>
     <tbody id="tableBody"></tbody>
   </table>
 </div>
 
-<div id="editModal" class="modal-overlay hidden">
+<div id="badgeModal" class="modal-overlay hidden">
   <div class="modal-content">
-    <h3 id="editTitle">Edit Record</h3>
-    <label>Name/Code:</label>
-    <input id="edit_val_name">
-    <label>Date Earned:</label>
-    <input type="date" id="edit_val_date">
-    <button onclick="saveBadgeChange()">Save Changes</button>
-    <button onclick="deleteBadgeRecord()" class="btn-danger">Delete This Badge</button>
+    <h3>Edit Badge Entry</h3>
+    <input id="edit_b_name">
+    <input type="date" id="edit_b_date">
+    <button onclick="saveBadgeEdit()">Save Changes</button>
+    <button onclick="deleteBadge()" class="btn-danger">Delete</button>
     <button onclick="closeModal()" class="btn-secondary">Cancel</button>
   </div>
 </div>
 
+<div id="printArea" class="hidden"></div>
+
 <script>
-let scouts = JSON.parse(localStorage.getItem("scout_db") || "[]");
+let scouts = JSON.parse(localStorage.getItem("pro_scout_db") || "[]");
 let currentUser = null;
-let currentAwardTab = 'badge';
-let activeEdit = { reg: null, index: null };
+let currentTab = 'badge';
+let activeFilter = 'All';
+let editCtx = { r: null, i: null };
+
+const BADGES = ["J.A./01","J.A./02","J.A./03","J.A./04","J.A./05","J.A./06","J.A./07","J.A./08","J.A./09","J.A./10","J.B./01","J.B./02","J.B./03","J.B./04","J.B./05","J.C./01","J.C./02","J.C./03","J.C./04","J.D./01","J.D./02","J.D./03","J.D./04","J.E./01","J.F./01","J.F./02","J.F./03","J.F./04","J.F./05","J.G./01","J.G./02","J.G./03","J.G./04","J.G./05","J.H./01","J.H./02","J.H./03","J.H./04","J.H./05","J.H./06","J.I./01","J.I./02","J.I./03","J.J./01","J.J./02","J.J./03","J.J./04","J.K./01","J.K./02","J.K./03","J.L./01","J.L./02","J.M./01","S.A./01","S.A./02","S.A./03","S.A./04","S.A./05","S.A./06","S.A./07","S.A./08","S.A./09","S.A./10","S.A./11","S.A./12","S.B./01","S.B./02","S.B./03","S.B./04","S.B./05","S.B./06","S.C./01","S.C./02","S.C./03","S.C./04","S.C./05","S.D./01","S.D./02","S.D./03","S.D./04","S.D./05","S.E./01","S.E./02","S.F./01","S.F./02","S.F./03","S.F./04","S.F./05","S.G./01","S.G./02","S.G./03","S.G./04","S.G./05","S.G./06","S.H./01","S.H./02","S.H./03","S.H./04","S.H./05","S.H./06","S.H./07","S.I./01","S.I./02","S.I./03","S.J./01","S.J./02","S.J./03","S.J./04","S.J./05","S.K./01","S.K./02","S.K./03","S.K./04","S.K./05","S.L./01","S.L./02","S.M./01"];
 
 function handleLogin() {
-    const u = document.getElementById("user").value;
-    const p = document.getElementById("pass").value;
-    if((u === "admin" && p === "admin123") || (u === "entry" && p === "entry123")) {
+    const u = document.getElementById("user").value, p = document.getElementById("pass").value;
+    if((u==='admin'&&p==='admin123')||(u==='entry'&&p==='entry123')) {
         currentUser = u;
         document.getElementById("loginPage").classList.add("hidden");
         document.getElementById("mainDashboard").classList.remove("hidden");
-        renderTable();
-    } else { alert("Login failed"); }
+        document.getElementById("roleDisplay").innerText = `(${u.toUpperCase()})`;
+        populateBadges(); renderTable();
+    } else alert("Denied");
 }
 
-function setAwardType(type) {
-    currentAwardTab = type;
-    document.getElementById("tabB").className = type === 'badge' ? "tab-btn active" : "tab-btn";
-    document.getElementById("tabA").className = type === 'award' ? "tab-btn active" : "tab-btn";
-    document.getElementById("award_name_badge").classList.toggle("hidden", type !== 'badge');
-    document.getElementById("award_name_core").classList.toggle("hidden", type !== 'award');
+function setFilter(val, btn) {
+    activeFilter = val;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTable();
+}
+
+function populateBadges(f = "") {
+    const s = document.getElementById("award_name_badge"); s.innerHTML = "";
+    BADGES.filter(b => b.toLowerCase().includes(f.toLowerCase())).forEach(b => {
+        let o = document.createElement("option"); o.text = o.value = b; s.add(o);
+    });
+}
+function filterBadgeOptions() { populateBadges(document.getElementById("badgeSearch").value); }
+
+function setAwardTab(t) {
+    currentTab = t;
+    document.getElementById("tabB").className = t==='badge'?'tab-btn active':'tab-btn';
+    document.getElementById("tabA").className = t==='award'?'tab-btn active':'tab-btn';
+    document.getElementById("badgeSelector").classList.toggle("hidden", t!=='badge');
+    document.getElementById("award_name_core").classList.toggle("hidden", t!=='award');
 }
 
 function registerScout() {
-    const reg = document.getElementById("reg_id").value;
-    if(!reg || scouts.some(s => s.reg === reg)) {
-        alert("Registration Number missing or already exists!");
-        return;
-    }
-    scouts.push({
-        reg,
-        name: document.getElementById("reg_name").value,
-        section: document.getElementById("reg_section").value,
-        troop: document.getElementById("reg_troop").value,
-        dob: document.getElementById("reg_dob").value,
-        awards: []
-    });
+    const id = document.getElementById("reg_id").value;
+    if(!id || scouts.some(s => s.reg === id)) return alert("Error");
+    scouts.push({ reg: id, name: document.getElementById("reg_name").value, section: document.getElementById("reg_section_input").value, troop: document.getElementById("reg_troop").value, dob: document.getElementById("reg_dob").value, history: [] });
     sync();
 }
 
-function addAwardToScout() {
-    const r = document.getElementById("award_reg").value;
-    const s = scouts.find(x => x.reg === r);
-    const name = currentAwardTab === 'badge' ? document.getElementById("award_name_badge").value : document.getElementById("award_name_core").value;
-    const date = document.getElementById("award_date").value;
-
-    if(!s || !name || !date) return alert("Fill all info correctly");
-    
-    s.awards.push({ name, date, type: currentAwardTab });
+function awardScout() {
+    const s = scouts.find(x => x.reg === document.getElementById("award_reg").value);
+    const n = currentTab==='badge' ? document.getElementById("award_name_badge").value : document.getElementById("award_name_core").value;
+    const d = document.getElementById("award_date").value;
+    if(!s || !n || !d) return alert("Fill all");
+    s.history.push({ name: n, date: d, type: currentTab });
     sync();
 }
 
 function renderTable() {
-    const body = document.getElementById("tableBody");
-    const query = document.getElementById("searchBar").value.toLowerCase();
+    const body = document.getElementById("tableBody"), q = document.getElementById("mainSearch").value.toLowerCase();
     body.innerHTML = "";
-
-    scouts.filter(s => s.name.toLowerCase().includes(query) || s.reg.includes(query)).forEach(s => {
-        let awardsHTML = s.awards.map((a, idx) => `
-            <div class="badge-tag type-${a.type} ${currentUser === 'admin' ? 'admin-edit-hint' : ''}" 
-                 onclick="${currentUser === 'admin' ? `openEdit('${s.reg}', ${idx})` : ''}">
-                ${a.name}
-                <span class="date-sub">${a.date}</span>
-            </div>
-        `).join("");
-
-        body.innerHTML += `
-            <tr>
-                <td><strong>${s.reg}</strong></td>
-                <td>
-                    <strong>${s.name}</strong><br>
-                    <small>DOB: ${s.dob} | ${s.section}</small>
-                </td>
-                <td>${awardsHTML || '<em>No records</em>'}</td>
-                <td class="no-print"><button onclick="window.print()" style="width:auto; padding:5px 10px">🖨️</button></td>
-            </tr>
-        `;
+    scouts.filter(s => (activeFilter==='All' || s.section === activeFilter) && (s.name.toLowerCase().includes(q) || s.reg.includes(q))).forEach(s => {
+        let hist = s.history.map((h, i) => `<div class="badge-tag type-${h.type} ${currentUser==='admin'?'admin-clickable':''}" onclick="${currentUser==='admin'?`openEdit('${s.reg}',${i})`:''}">
+            ${h.name}<span class="date-sub">${h.date}</span></div>`).join("");
+        body.innerHTML += `<tr><td><b>${s.reg}</b></td><td><b>${s.name}</b><br><small>${s.section} | DOB: ${s.dob}</small></td><td>${hist}</td>
+        <td class="no-print"><button onclick="printRow('${s.reg}')" style="width:auto">🖨️</button></td></tr>`;
     });
 }
 
-function openEdit(reg, index) {
-    activeEdit = { reg, index };
-    const s = scouts.find(x => x.reg === reg);
-    const a = s.awards[index];
-    document.getElementById("edit_val_name").value = a.name;
-    document.getElementById("edit_val_date").value = a.date;
-    document.getElementById("editModal").classList.remove("hidden");
-}
+function openEdit(r, i) { editCtx = { r, i }; const s = scouts.find(x => x.reg === r); document.getElementById("edit_b_name").value = s.history[i].name; document.getElementById("edit_b_date").value = s.history[i].date; document.getElementById("badgeModal").classList.remove("hidden"); }
+function saveBadgeEdit() { const s = scouts.find(x => x.reg === editCtx.r); s.history[editCtx.i].name = document.getElementById("edit_b_name").value; s.history[editCtx.i].date = document.getElementById("edit_b_date").value; sync(); closeModal(); }
+function deleteBadge() { if(confirm("Delete?")) { scouts.find(x => x.reg === editCtx.r).history.splice(editCtx.i, 1); sync(); closeModal(); } }
+function sync() { localStorage.setItem("pro_scout_db", JSON.stringify(scouts)); renderTable(); }
+function closeModal() { document.getElementById("badgeModal").classList.add("hidden"); }
 
-function saveBadgeChange() {
-    const s = scouts.find(x => x.reg === activeEdit.reg);
-    s.awards[activeEdit.index].name = document.getElementById("edit_val_name").value;
-    s.awards[activeEdit.index].date = document.getElementById("edit_val_date").value;
-    sync();
-    closeModal();
+function printRow(r) {
+    const s = scouts.find(x => x.reg === r);
+    document.getElementById("printArea").innerHTML = `<div style="padding:40px; border:5px solid #2563eb; text-align:center">
+        <h1>SCOUT RECORD</h1><hr><p>Name: ${s.name} | Reg: ${s.reg}</p>
+        <p>Section: ${s.section} | Troop: ${s.troop}</p>
+        <table border="1" style="width:100%; border-collapse:collapse">
+            <tr style="background:#eee"><th>Badge/Award</th><th>Date</th></tr>
+            ${s.history.map(h=>`<tr><td>${h.name}</td><td>${h.date}</td></tr>`).join("")}
+        </table></div>`;
+    window.print();
 }
-
-function deleteBadgeRecord() {
-    if(confirm("Permanently delete this badge record?")) {
-        const s = scouts.find(x => x.reg === activeEdit.reg);
-        s.awards.splice(activeEdit.index, 1);
-        sync();
-        closeModal();
-    }
-}
-
-function sync() {
-    localStorage.setItem("scout_db", JSON.stringify(scouts));
-    renderTable();
-}
-
-function closeModal() { document.getElementById("editModal").classList.add("hidden"); }
 </script>
 </body>
 </html>
