@@ -6,24 +6,37 @@
 <title>Scout Database System Pro</title>
 <style>
   body{font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;background:#f4f6f8;padding:20px;line-height:1.6}
-  .container{max-width:1100px;margin:auto;background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+  .container{max-width:1200px;margin:auto;background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
   input,select,button{padding:10px;width:100%;margin-bottom:10px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box}
   button{background:#2563eb;color:#fff;border:none;cursor:pointer;font-weight:600;transition:0.2s}
   button:hover{background:#1d4ed8}
-  .btn-export{background:#10b981; margin-bottom: 20px;}
-  .btn-export:hover{background:#059669}
-  .btn-print{background:#6366f1;padding:4px 8px;font-size:12px;width:auto}
+  .btn-export{background:#10b981; margin-bottom: 20px; width: 100%; display: block;}
+  .btn-print{background:#6366f1;padding:6px 12px;font-size:12px;width:auto;margin-right:5px}
   .btn-danger{background:#ef4444; width: auto;}
   .hidden{display:none}
-  table{width:100%;border-collapse:collapse;margin-top:15px}
-  th,td{border:1px solid #ddd;padding:12px;text-align:left}
-  th{background:#f1f5f9;color:#475569}
-  .badge-item{background:#f8fafc;border:1px solid #e2e8f0;padding:4px 8px;margin-bottom:4px;border-radius:4px;display:inline-block;margin-right:5px;font-size:0.85rem}
   
+  /* Stats Cards */
+  .stats-grid{display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:15px; margin-bottom:20px;}
+  .stat-card{background:#f1f5f9; padding:15px; border-radius:8px; text-align:center; border-bottom:4px solid #2563eb; cursor:pointer; transition: transform 0.2s, background 0.2s;}
+  .stat-card:hover{transform: translateY(-3px); background: #e2e8f0;}
+  .stat-card.active{background: #dbeafe; border-bottom-color: #1d4ed8; border-width: 2px;}
+  .stat-card h4{margin:0; font-size:0.9rem; color:#64748b}
+  .stat-card p{margin:5px 0 0; font-size:1.5rem; font-weight:bold; color:#1e293b}
+
+  table{width:100%; border-collapse:collapse; margin-top:15px}
+  th,td{border:1px solid #ddd; padding:12px; text-align:left}
+  th{background:#f1f5f9; color:#475569; cursor:pointer; position: relative;}
+  th:hover{background:#e2e8f0;}
+  th::after{content:' ↕'; font-size: 0.8em; color: #94a3b8;}
+
+  .badge-item{background:#ebf5ff; border:1px solid #bfdbfe; color:#1e40af; padding:2px 6px; margin:2px; border-radius:4px; font-size:0.75rem; display:inline-block;}
+  .section-tag{padding:2px 8px; border-radius:12px; font-size:0.7rem; font-weight:bold; text-transform:uppercase; color:#fff; margin-left: 5px;}
+  .sigithi{background:#f59e0b;} .cub{background:#ef4444;} .scout{background:#10b981;} .rover{background:#6366f1;}
+
   @media print {
     body * { visibility: hidden; }
     #printArea, #printArea * { visibility: visible; }
-    #printArea { position: absolute; left: 0; top: 0; width: 100%; text-align: center; padding: 40px; border: 10px double #2563eb; }
+    #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 40px; border: 5px solid #2563eb; }
   }
 </style>
 </head>
@@ -34,37 +47,51 @@
   <input id="username" placeholder="Username">
   <input id="password" type="password" placeholder="Password">
   <button onclick="login()">Login</button>
-  <p style="font-size:0.8rem;color:#666">Admin: admin / admin123 | Entry: entry / entry123</p>
 </div>
 
 <div class="container hidden" id="dashboard">
   <div style="display:flex; justify-content:space-between; align-items:center">
     <h2>Scout Management Dashboard</h2>
-    <button onclick="logout()" class="btn-danger">Logout</button>
+    <div>
+        <button id="clearAllBtn" onclick="clearDatabase()" class="btn-danger hidden" style="margin-right:10px">⚠️ Clear All</button>
+        <button onclick="logout()" class="btn-danger">Logout</button>
+    </div>
   </div>
-  <p>Logged in as: <b id="roleText" style="text-transform:uppercase"></b></p>
+
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card" onclick="filterBySection('All')" id="stat-all"><h4>Total</h4><p id="totalCount">0</p></div>
+    <div class="stat-card" onclick="filterBySection('Sigithi Scout')" id="stat-sigithi"><h4>Sigithi</h4><p id="sigithiCount">0</p></div>
+    <div class="stat-card" onclick="filterBySection('Cub Scout')" id="stat-cub"><h4>Cub</h4><p id="cubCount">0</p></div>
+    <div class="stat-card" onclick="filterBySection('Scout')" id="stat-scout"><h4>Scout</h4><p id="scoutCount">0</p></div>
+    <div class="stat-card" onclick="filterBySection('Rover Scout')" id="stat-rover"><h4>Rover</h4><p id="roverCount">0</p></div>
+  </div>
   
-  <button class="btn-export" onclick="exportToCSV()">📥 Download Excel (CSV) Report</button>
+  <button class="btn-export" onclick="exportToCSV()">📥 Download All Records (Excel/CSV)</button>
 
   <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-    <div style="background:#f9fafb; padding:15px; border-radius:8px;">
+    <div style="background:#f9fafb; padding:15px; border-radius:8px; border:1px solid #e5e7eb">
       <h3>Step 1: Register New Scout</h3>
-      <input id="s_reg" placeholder="Registration No (Unique)">
+      <input id="s_reg" placeholder="Registration No">
       <input id="s_name" placeholder="Full Name">
-      <input id="s_troop" placeholder="Troop Name">
+      <select id="s_section">
+        <option value="">-- Select Section --</option>
+        <option value="Sigithi Scout">Sigithi Scout</option>
+        <option value="Cub Scout">Cub Scout</option>
+        <option value="Scout">Scout</option>
+        <option value="Rover Scout">Rover Scout</option>
+      </select>
+      <input id="s_troop" placeholder="Troop/Unit Name">
       <input id="s_dob" type="date">
       <button onclick="addScout()">+ Save Scout Profile</button>
     </div>
 
-    <div style="background:#f9fafb; padding:15px; border-radius:8px;">
+    <div style="background:#f9fafb; padding:15px; border-radius:8px; border:1px solid #e5e7eb">
       <h3>Step 2: Award Badge</h3>
       <input id="b_reg" placeholder="Enter Registration No">
       <select id="b_name">
         <option value="">-- Select Badge --</option>
-        <option>President Award</option>
-        <option>PM Award</option>
-        <option>JA/01</option>
-        <option>SA/01</option>
+        <option>President Award</option><option>PM Award</option><option>Membership</option>
+        <option>JA/01</option><option>SA/01</option>
       </select>
       <input type="date" id="b_date">
       <button onclick="addBadge()" style="background:#8b5cf6">🎖️ Update Record</button>
@@ -72,14 +99,18 @@
   </div>
 
   <hr style="margin:25px 0">
-  <h3>Search Records</h3>
-  <input id="search" placeholder="🔍 Search by Registration Number..." onkeyup="render()">
+  
+  <div style="display:flex; justify-content:space-between; align-items:center">
+    <h3>Registered Scout Records <span id="filterLabel" style="font-size:0.8rem; color:#2563eb; margin-left:10px"></span></h3>
+    <button onclick="filterBySection('All')" style="width:auto; padding:5px 10px; font-size:0.8rem; background:#64748b">Reset Filters</button>
+  </div>
+  <input id="search" placeholder="🔍 Search by Reg No or Name..." onkeyup="render()">
 
   <table>
     <thead>
       <tr>
-        <th>Reg No</th>
-        <th>Basic Info</th>
+        <th onclick="sortTable('reg')">Reg No</th>
+        <th onclick="sortTable('name')">Scout Details</th>
         <th>Badges Earned</th>
         <th>Actions</th>
       </tr>
@@ -91,137 +122,131 @@
 <div id="printArea" class="hidden"></div>
 
 <script>
-/* DATA & USERS */
 let currentUser = null;
 let scouts = JSON.parse(localStorage.getItem("scouts") || "[]");
+let currentFilter = "All";
+let sortDirection = 1;
+
 const users = {
   admin: { password: "admin123", role: "admin" },
   entry: { password: "entry123", role: "entry" }
 };
 
-/* AUTHENTICATION */
 function login() {
-  const u = document.getElementById("username").value;
-  const p = document.getElementById("password").value;
+  const u = document.getElementById("username").value.trim();
+  const p = document.getElementById("password").value.trim();
   if (users[u] && users[u].password === p) {
     currentUser = users[u];
     document.getElementById("loginBox").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
-    document.getElementById("roleText").innerText = currentUser.role;
-    render();
-  } else { alert("Invalid login"); }
+    if(currentUser.role === 'admin') document.getElementById("clearAllBtn").classList.remove("hidden");
+    render(); 
+  } else { alert("Invalid Credentials"); }
 }
 
 function logout() { location.reload(); }
-function save() { localStorage.setItem("scouts", JSON.stringify(scouts)); }
+function save() { localStorage.setItem("scouts", JSON.stringify(scouts)); updateStats(); }
 
-/* ADD NEW SCOUT */
+function updateStats() {
+    document.getElementById("totalCount").innerText = scouts.length;
+    document.getElementById("sigithiCount").innerText = scouts.filter(s => s.section === "Sigithi Scout").length;
+    document.getElementById("cubCount").innerText = scouts.filter(s => s.section === "Cub Scout").length;
+    document.getElementById("scoutCount").innerText = scouts.filter(s => s.section === "Scout").length;
+    document.getElementById("roverCount").innerText = scouts.filter(s => s.section === "Rover Scout").length;
+}
+
+function filterBySection(section) {
+    currentFilter = section;
+    document.getElementById("filterLabel").innerText = section !== "All" ? `(Showing: ${section})` : "";
+    
+    // UI highlight for active card
+    document.querySelectorAll('.stat-card').forEach(card => card.classList.remove('active'));
+    if(section === 'All') document.getElementById('stat-all').classList.add('active');
+    else {
+        const id = section.split(' ')[0].toLowerCase();
+        document.getElementById(`stat-${id}`).classList.add('active');
+    }
+    render();
+}
+
+function sortTable(key) {
+    sortDirection *= -1;
+    scouts.sort((a, b) => {
+        let valA = (a[key] || "").toLowerCase();
+        let valB = (b[key] || "").toLowerCase();
+        return valA < valB ? -1 * sortDirection : (valA > valB ? 1 * sortDirection : 0);
+    });
+    render();
+}
+
+function clearDatabase() {
+    if(confirm("DANGER: Delete ALL records?")) { scouts = []; save(); render(); }
+}
+
 function addScout() {
   const reg = document.getElementById("s_reg").value.trim();
   const name = document.getElementById("s_name").value.trim();
-  
-  if (!reg || !name) return alert("Reg No and Name are required");
-  
-  // Checks if Scout already exists
-  if (scouts.find(s => s.reg === reg)) {
-    return alert("Error: Reg No '" + reg + "' already exists! Use Step 2 to add badges.");
-  }
+  const section = document.getElementById("s_section").value;
 
-  scouts.push({
-    reg: reg,
-    name: name,
-    dob: document.getElementById("s_dob").value,
-    troop: document.getElementById("s_troop").value,
-    badges: []
-  });
-  
-  // Clear form after save
-  ["s_reg","s_name","s_troop","s_dob"].forEach(id => document.getElementById(id).value = "");
-  save(); 
-  render();
-  alert("Scout saved successfully!");
+  if (!reg || !name || !section) return alert("Required: Reg No, Name, Section");
+  if (scouts.some(s => s.reg === reg)) return alert("Reg No already in use.");
+
+  scouts.push({ reg, name, section, troop: document.getElementById("s_troop").value, dob: document.getElementById("s_dob").value, badges: [] });
+  save(); render();
+  ["s_reg","s_name","s_troop","s_dob","s_section"].forEach(id => document.getElementById(id).value = "");
 }
 
-/* ADD BADGE TO EXISTING SCOUT */
 function addBadge() {
   const reg = document.getElementById("b_reg").value.trim();
-  const badgeName = document.getElementById("b_name").value;
-  const badgeDate = document.getElementById("b_date").value;
   const scout = scouts.find(s => s.reg === reg);
-
-  if (!scout) return alert("Scout not found. Register them in Step 1 first.");
-  if (!badgeName || !badgeDate) return alert("Select badge and date");
-
-  scout.badges.push({ name: badgeName, date: badgeDate });
-  scout.badges.sort((a,b) => new Date(b.date) - new Date(a.date)); // Newest first
-  
-  save(); 
-  render();
-  alert("Badge added!");
+  if (!scout) return alert("Scout not found!");
+  scout.badges.push({ name: document.getElementById("b_name").value, date: document.getElementById("b_date").value });
+  scout.badges.sort((a,b) => new Date(b.date) - new Date(a.date));
+  save(); render();
 }
 
-/* EXPORT DATA */
-function exportToCSV() {
-  if (scouts.length === 0) return alert("No data to export");
-  let csv = "Reg No,Name,DOB,Troop,Badges\n";
-  scouts.forEach(s => {
-    const bStr = s.badges.map(b => `${b.name}(${b.date})`).join("; ");
-    csv += `${s.reg},${s.name},${s.dob},${s.troop},"${bStr}"\n`;
-  });
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'Scout_Report.csv';
-  a.click();
-}
-
-/* RENDER THE TABLE */
 function render() {
   const table = document.getElementById("table");
   table.innerHTML = "";
-  const q = document.getElementById("search").value.toLowerCase();
-  const isAdmin = currentUser.role === "admin";
+  const query = document.getElementById("search").value.toLowerCase();
+  
+  let filtered = scouts;
+  if(currentFilter !== "All") {
+      filtered = filtered.filter(s => s.section === currentFilter);
+  }
+  filtered = filtered.filter(s => s.reg.toLowerCase().includes(query) || s.name.toLowerCase().includes(query));
 
-  scouts.filter(s => s.reg.toLowerCase().includes(q)).forEach(s => {
-    let badgeHTML = s.badges.map((b, i) => `
-      <span class="badge-item">
-        ${b.name} (${b.date})
-        ${isAdmin ? `<span style="cursor:pointer;color:red" onclick="deleteBadge('${s.reg}',${i})">×</span>` : ""}
-      </span>
-    `).join("");
-
+  filtered.forEach(s => {
+    let sectionClass = s.section ? s.section.split(' ')[0].toLowerCase() : "";
     table.innerHTML += `
       <tr>
         <td><b>${s.reg}</b></td>
-        <td>${s.name}<br><small>${s.troop} | ${s.dob}</small></td>
-        <td>${badgeHTML}</td>
-        <td>
-          <button class="btn-print" onclick="printScout('${s.reg}')">🖨️ Print</button>
-          ${isAdmin ? `<button class="btn-print" style="background:#ef4444" onclick="deleteScout('${s.reg}')">🗑️</button>` : ""}
-        </td>
+        <td><strong>${s.name}</strong> <span class="section-tag ${sectionClass}">${s.section}</span><br><small>${s.troop} | ${s.dob}</small></td>
+        <td>${s.badges.map(b => `<span class="badge-item">${b.name}</span>`).join("")}</td>
+        <td><button class="btn-print" onclick="printScout('${s.reg}')">🖨️</button>${currentUser.role === 'admin' ? `<button class="btn-print" style="background:#ef4444" onclick="deleteScout('${s.reg}')">🗑️</button>` : ""}</td>
       </tr>`;
   });
-}
-
-function deleteBadge(reg, index) {
-  const s = scouts.find(x => x.reg === reg);
-  if (confirm("Remove badge?")) { s.badges.splice(index, 1); save(); render(); }
+  updateStats();
 }
 
 function deleteScout(reg) {
-  if(confirm("Delete this scout?")) {
-    scouts = scouts.filter(s => s.reg !== reg);
-    save(); render();
-  }
+  if (confirm("Delete scout?")) { scouts = scouts.filter(s => s.reg !== reg); save(); render(); }
 }
 
 function printScout(reg) {
   const s = scouts.find(x => x.reg === reg);
-  const printArea = document.getElementById("printArea");
-  let badgeList = s.badges.map(b => `<li>${b.name} (${b.date})</li>`).join("");
-  printArea.innerHTML = `<h2>${s.name}</h2><p>Reg: ${s.reg}</p><ul>${badgeList}</ul>`;
+  document.getElementById("printArea").innerHTML = `<h1>${s.name}</h1><p>${s.section} | Reg: ${s.reg}</p>`;
   window.print();
+}
+
+function exportToCSV() {
+  if (!scouts.length) return alert("No data!");
+  let csv = "Reg No,Name,Section,DOB,Troop,Badges\n" + scouts.map(s => `${s.reg},${s.name},${s.section},${s.dob},${s.troop},"${s.badges.map(b => b.name).join('|')}"`).join("\n");
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "Scout_Database.csv";
+  a.click();
 }
 </script>
 </body>
