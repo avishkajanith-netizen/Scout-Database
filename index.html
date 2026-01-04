@@ -24,7 +24,7 @@ th{background:#f1f5f9}
 <input id="username" placeholder="Username">
 <input id="password" type="password" placeholder="Password">
 <button onclick="login()">Login</button>
-<p>Admin: admin / admin123<br>Entry: entry / entry123</p>  
+<p>Admin: admin / admin123<br>Entry: entry / entry123</p>
 </div>
 
 <!-- DASHBOARD -->
@@ -214,6 +214,9 @@ th{background:#f1f5f9}
 </select>
 <input type="date" id="b_date">
 <button onclick="addBadge()">Add Badge</button>
+<button onclick="exportToCSV()" style="background:#10b981; margin-top:10px;">
+  📥 Download Excel (CSV) Report
+</button>
 
 <h3>Search Scout</h3>
 <input id="search" placeholder="Enter Registration No" onkeyup="render()">
@@ -391,8 +394,31 @@ function render() {
       </tr>`;
     });
 }
+/* ===== EXPORT TO CSV ===== */
+function exportToCSV() {
+  if (scouts.length === 0) return alert("No data to export");
+
+  // Define CSV Headers
+  let csvContent = "data:text/csv;charset=utf-8,";
+  csvContent += "Reg No,Name,DoB,Troop,Badges\n";
+
+  // Add Data Rows
+  scouts.forEach(s => {
+    // Join badges into a single string separated by semicolons
+    const badgeString = s.badges.map(b => `${b.name} (${b.date})`).join("; ");
+    const row = [s.reg, s.name, s.dob, s.troop, `"${badgeString}"`].join(",");
+    csvContent += row + "\n";
+  });
+
+  // Create download link and trigger it
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "scout_database_backup.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
 </script>
 </body>
 </html>
-
-
