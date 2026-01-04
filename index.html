@@ -10,22 +10,20 @@
   input,select,button{padding:10px;width:100%;margin-bottom:10px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box}
   button{background:#2563eb;color:#fff;border:none;cursor:pointer;font-weight:600;transition:0.2s}
   button:hover{background:#1d4ed8}
-  .btn-export{background:#10b981}
+  .btn-export{background:#10b981; margin-bottom: 20px;}
   .btn-export:hover{background:#059669}
   .btn-print{background:#6366f1;padding:4px 8px;font-size:12px;width:auto}
+  .btn-danger{background:#ef4444; width: auto;}
   .hidden{display:none}
   table{width:100%;border-collapse:collapse;margin-top:15px}
   th,td{border:1px solid #ddd;padding:12px;text-align:left}
   th{background:#f1f5f9;color:#475569}
-  .admin-only{background:#fee2e2}
   .badge-item{background:#f8fafc;border:1px solid #e2e8f0;padding:4px 8px;margin-bottom:4px;border-radius:4px;display:inline-block;margin-right:5px;font-size:0.85rem}
   
-  /* Print styling for certificates */
   @media print {
     body * { visibility: hidden; }
     #printArea, #printArea * { visibility: visible; }
     #printArea { position: absolute; left: 0; top: 0; width: 100%; text-align: center; padding: 40px; border: 10px double #2563eb; }
-    .no-print { display: none; }
   }
 </style>
 </head>
@@ -42,43 +40,39 @@
 <div class="container hidden" id="dashboard">
   <div style="display:flex; justify-content:space-between; align-items:center">
     <h2>Scout Management Dashboard</h2>
-    <button onclick="logout()" style="width:auto; background:#ef4444">Logout</button>
+    <button onclick="logout()" class="btn-danger">Logout</button>
   </div>
-  <p>Active Session: <b id="roleText" style="text-transform:uppercase"></b></p>
+  <p>Logged in as: <b id="roleText" style="text-transform:uppercase"></b></p>
   
-  <button class="btn-export" onclick="exportToCSV()">📥 Export Database to Excel (CSV)</button>
+  <button class="btn-export" onclick="exportToCSV()">📥 Download Excel (CSV) Report</button>
 
   <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-    <div>
+    <div style="background:#f9fafb; padding:15px; border-radius:8px;">
       <h3>Step 1: Register New Scout</h3>
-      <input id="s_reg" placeholder="Registration No">
+      <input id="s_reg" placeholder="Registration No (Unique)">
       <input id="s_name" placeholder="Full Name">
-      <input id="s_troop" placeholder="Troop/Unit Name">
+      <input id="s_troop" placeholder="Troop Name">
       <input id="s_dob" type="date">
       <button onclick="addScout()">+ Save Scout Profile</button>
     </div>
-    <div>
+
+    <div style="background:#f9fafb; padding:15px; border-radius:8px;">
       <h3>Step 2: Award Badge</h3>
       <input id="b_reg" placeholder="Enter Registration No">
       <select id="b_name">
-        <option value="">-- Select Badge Type --</option>
-        <optgroup label="Core Awards">
-          <option>President Award</option><option>PM Award</option><option>Membership</option>
-        </optgroup>
-        <optgroup label="J Series (Junior)">
-          <option>JA/01</option><option>JA/02</option><option>JA/03</option><option>JB/01</option>
-        </optgroup>
-        <optgroup label="S Series (Senior)">
-          <option>SA/01</option><option>SA/02</option><option>SB/01</option><option>SC/01</option>
-        </optgroup>
+        <option value="">-- Select Badge --</option>
+        <option>President Award</option>
+        <option>PM Award</option>
+        <option>JA/01</option>
+        <option>SA/01</option>
       </select>
       <input type="date" id="b_date">
-      <button onclick="addBadge()" style="background:#8b5cf6">🎖️ Update Scout Record</button>
+      <button onclick="addBadge()" style="background:#8b5cf6">🎖️ Update Record</button>
     </div>
   </div>
 
-  <hr>
-  <h3>Search & Management</h3>
+  <hr style="margin:25px 0">
+  <h3>Search Records</h3>
   <input id="search" placeholder="🔍 Search by Registration Number..." onkeyup="render()">
 
   <table>
@@ -87,7 +81,7 @@
         <th>Reg No</th>
         <th>Basic Info</th>
         <th>Badges Earned</th>
-        <th class="admin-only">Actions</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody id="table"></tbody>
@@ -97,6 +91,7 @@
 <div id="printArea" class="hidden"></div>
 
 <script>
+/* DATA & USERS */
 let currentUser = null;
 let scouts = JSON.parse(localStorage.getItem("scouts") || "[]");
 const users = {
@@ -104,6 +99,7 @@ const users = {
   entry: { password: "entry123", role: "entry" }
 };
 
+/* AUTHENTICATION */
 function login() {
   const u = document.getElementById("username").value;
   const p = document.getElementById("password").value;
@@ -119,79 +115,68 @@ function login() {
 function logout() { location.reload(); }
 function save() { localStorage.setItem("scouts", JSON.stringify(scouts)); }
 
+/* ADD NEW SCOUT */
 function addScout() {
-  const reg = document.getElementById("s_reg").value;
-  if (!reg) return alert("Registration No required");
-  if (scouts.find(s => s.reg === reg)) return alert("Reg No already exists");
+  const reg = document.getElementById("s_reg").value.trim();
+  const name = document.getElementById("s_name").value.trim();
+  
+  if (!reg || !name) return alert("Reg No and Name are required");
+  
+  // Checks if Scout already exists
+  if (scouts.find(s => s.reg === reg)) {
+    return alert("Error: Reg No '" + reg + "' already exists! Use Step 2 to add badges.");
+  }
 
   scouts.push({
     reg: reg,
-    name: document.getElementById("s_name").value,
+    name: name,
     dob: document.getElementById("s_dob").value,
     troop: document.getElementById("s_troop").value,
     badges: []
   });
   
+  // Clear form after save
   ["s_reg","s_name","s_troop","s_dob"].forEach(id => document.getElementById(id).value = "");
-  save(); render();
+  save(); 
+  render();
+  alert("Scout saved successfully!");
 }
 
+/* ADD BADGE TO EXISTING SCOUT */
 function addBadge() {
-  const reg = document.getElementById("b_reg").value;
+  const reg = document.getElementById("b_reg").value.trim();
   const badgeName = document.getElementById("b_name").value;
   const badgeDate = document.getElementById("b_date").value;
   const scout = scouts.find(s => s.reg === reg);
 
-  if (!scout) return alert("Scout not found");
+  if (!scout) return alert("Scout not found. Register them in Step 1 first.");
   if (!badgeName || !badgeDate) return alert("Select badge and date");
 
   scout.badges.push({ name: badgeName, date: badgeDate });
-  scout.badges.sort((a,b) => new Date(b.date) - new Date(a.date)); // Sort newest first
+  scout.badges.sort((a,b) => new Date(b.date) - new Date(a.date)); // Newest first
   
-  save(); render();
+  save(); 
+  render();
+  alert("Badge added!");
 }
 
+/* EXPORT DATA */
 function exportToCSV() {
   if (scouts.length === 0) return alert("No data to export");
-  let csv = "Registration No,Name,DOB,Troop,Badges\n";
+  let csv = "Reg No,Name,DOB,Troop,Badges\n";
   scouts.forEach(s => {
-    const bStr = s.badges.map(b => `${b.name}(${b.date})`).join(" | ");
+    const bStr = s.badges.map(b => `${b.name}(${b.date})`).join("; ");
     csv += `${s.reg},${s.name},${s.dob},${s.troop},"${bStr}"\n`;
   });
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'Scout_Database_Export.csv';
+  a.download = 'Scout_Report.csv';
   a.click();
 }
 
-function printScout(reg) {
-  const s = scouts.find(x => x.reg === reg);
-  const printArea = document.getElementById("printArea");
-  let badgeList = s.badges.map(b => `<li>${b.name} - ${b.date}</li>`).join("");
-  
-  printArea.innerHTML = `
-    <h1>CERTIFICATE OF ACHIEVEMENT</h1>
-    <p>This is to certify that</p>
-    <h2>${s.name.toUpperCase()}</h2>
-    <p>Registration: ${s.reg} | Troop: ${s.troop}</p>
-    <hr>
-    <h3>EARNED BADGES</h3>
-    <ul style="list-style:none; padding:0">${badgeList || "No badges earned yet"}</ul>
-    <br><br>
-    <p>_______________________<br>District Scout Commissioner</p>
-  `;
-  window.print();
-}
-
-function deleteScout(reg) {
-  if(confirm("Permanently delete this scout?")) {
-    scouts = scouts.filter(s => s.reg !== reg);
-    save(); render();
-  }
-}
-
+/* RENDER THE TABLE */
 function render() {
   const table = document.getElementById("table");
   table.innerHTML = "";
@@ -211,9 +196,9 @@ function render() {
         <td><b>${s.reg}</b></td>
         <td>${s.name}<br><small>${s.troop} | ${s.dob}</small></td>
         <td>${badgeHTML}</td>
-        <td class="${isAdmin ? '' : 'hidden'}">
+        <td>
           <button class="btn-print" onclick="printScout('${s.reg}')">🖨️ Print</button>
-          <button class="btn-print" style="background:#ef4444" onclick="deleteScout('${s.reg}')">🗑️</button>
+          ${isAdmin ? `<button class="btn-print" style="background:#ef4444" onclick="deleteScout('${s.reg}')">🗑️</button>` : ""}
         </td>
       </tr>`;
   });
@@ -222,6 +207,21 @@ function render() {
 function deleteBadge(reg, index) {
   const s = scouts.find(x => x.reg === reg);
   if (confirm("Remove badge?")) { s.badges.splice(index, 1); save(); render(); }
+}
+
+function deleteScout(reg) {
+  if(confirm("Delete this scout?")) {
+    scouts = scouts.filter(s => s.reg !== reg);
+    save(); render();
+  }
+}
+
+function printScout(reg) {
+  const s = scouts.find(x => x.reg === reg);
+  const printArea = document.getElementById("printArea");
+  let badgeList = s.badges.map(b => `<li>${b.name} (${b.date})</li>`).join("");
+  printArea.innerHTML = `<h2>${s.name}</h2><p>Reg: ${s.reg}</p><ul>${badgeList}</ul>`;
+  window.print();
 }
 </script>
 </body>
