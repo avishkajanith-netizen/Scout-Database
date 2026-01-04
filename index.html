@@ -17,19 +17,22 @@
   
   /* Stats Cards */
   .stats-grid{display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:15px; margin-bottom:20px;}
-  .stat-card{background:#f1f5f9; padding:15px; border-radius:8px; text-align:center; border-bottom:4px solid #2563eb; cursor:pointer; transition: transform 0.2s, background 0.2s;}
-  .stat-card:hover{transform: translateY(-3px); background: #e2e8f0;}
-  .stat-card.active{background: #dbeafe; border-bottom-color: #1d4ed8; border-width: 2px;}
+  .stat-card{background:#f1f5f9; padding:15px; border-radius:8px; text-align:center; border-bottom:4px solid #2563eb; cursor:pointer;}
+  .stat-card.active{background: #dbeafe; border-bottom-color: #1d4ed8;}
   .stat-card h4{margin:0; font-size:0.9rem; color:#64748b}
   .stat-card p{margin:5px 0 0; font-size:1.5rem; font-weight:bold; color:#1e293b}
 
+  /* Syllabus Tabs */
+  .tab-container{display:flex; gap:5px; margin-bottom:10px}
+  .tab-btn{background:#e2e8f0; color:#475569; padding:8px; font-size:0.8rem; flex:1}
+  .tab-btn.active{background:#8b5cf6; color:white}
+
   table{width:100%; border-collapse:collapse; margin-top:15px}
   th,td{border:1px solid #ddd; padding:12px; text-align:left}
-  th{background:#f1f5f9; color:#475569; cursor:pointer; position: relative;}
-  th:hover{background:#e2e8f0;}
-  th::after{content:' ↕'; font-size: 0.8em; color: #94a3b8;}
+  th{background:#f1f5f9; color:#475569; cursor:pointer;}
 
   .badge-item{background:#ebf5ff; border:1px solid #bfdbfe; color:#1e40af; padding:2px 6px; margin:2px; border-radius:4px; font-size:0.75rem; display:inline-block;}
+  .award-item{background:#fef3c7; border:1px solid #fde68a; color:#92400e; padding:2px 6px; margin:2px; border-radius:4px; font-size:0.75rem; display:inline-block; font-weight: bold;}
   .section-tag{padding:2px 8px; border-radius:12px; font-size:0.7rem; font-weight:bold; text-transform:uppercase; color:#fff; margin-left: 5px;}
   .sigithi{background:#f59e0b;} .cub{background:#ef4444;} .scout{background:#10b981;} .rover{background:#6366f1;}
 
@@ -86,15 +89,31 @@
     </div>
 
     <div style="background:#f9fafb; padding:15px; border-radius:8px; border:1px solid #e5e7eb">
-      <h3>Step 2: Award Badge</h3>
+      <h3>Step 2: Awarding Syllabus</h3>
       <input id="b_reg" placeholder="Enter Registration No">
-      <select id="b_name">
-        <option value="">-- Select Badge --</option>
-        <option>President Award</option><option>PM Award</option><option>Membership</option>
-        <option>JA/01</option><option>SA/01</option>
+      
+      <div class="tab-container">
+        <button class="tab-btn active" id="tabBadge" onclick="toggleSyllabus('badge')">Proficiency Badges</button>
+        <button class="tab-btn" id="tabAward" onclick="toggleSyllabus('award')">Core Awards</button>
+      </div>
+
+      <select id="b_name_badge">
+        <option value="">-- Select Proficiency Badge --</option>
+        <option>JA/01 - Scout Craft</option><option>JA/02 - Hiker</option>
+        <option>SA/01 - Fireman</option><option>SB/01 - First Aid</option>
       </select>
+
+      <select id="b_name_award" class="hidden">
+        <option value="">-- Select Core Award --</option>
+        <option>Membership Badge</option>
+        <option>Bronze Award</option>
+        <option>Silver Award</option>
+        <option>Gold Award</option>
+        <option>President Award</option>
+      </select>
+
       <input type="date" id="b_date">
-      <button onclick="addBadge()" style="background:#8b5cf6">🎖️ Update Record</button>
+      <button onclick="processAward()" style="background:#8b5cf6">🎖️ Update Scout Record</button>
     </div>
   </div>
 
@@ -111,7 +130,7 @@
       <tr>
         <th onclick="sortTable('reg')">Reg No</th>
         <th onclick="sortTable('name')">Scout Details</th>
-        <th>Badges Earned</th>
+        <th>Badges & Awards Earned</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -125,12 +144,22 @@
 let currentUser = null;
 let scouts = JSON.parse(localStorage.getItem("scouts") || "[]");
 let currentFilter = "All";
+let syllabusMode = 'badge'; // 'badge' or 'award'
 let sortDirection = 1;
 
 const users = {
   admin: { password: "admin123", role: "admin" },
   entry: { password: "entry123", role: "entry" }
 };
+
+/* SYLLABUS TOGGLE LOGIC */
+function toggleSyllabus(mode) {
+    syllabusMode = mode;
+    document.getElementById('tabBadge').classList.toggle('active', mode === 'badge');
+    document.getElementById('tabAward').classList.toggle('active', mode === 'award');
+    document.getElementById('b_name_badge').classList.toggle('hidden', mode !== 'badge');
+    document.getElementById('b_name_award').classList.toggle('hidden', mode !== 'award');
+}
 
 function login() {
   const u = document.getElementById("username").value.trim();
@@ -157,52 +186,43 @@ function updateStats() {
 
 function filterBySection(section) {
     currentFilter = section;
-    document.getElementById("filterLabel").innerText = section !== "All" ? `(Showing: ${section})` : "";
-    
-    // UI highlight for active card
-    document.querySelectorAll('.stat-card').forEach(card => card.classList.remove('active'));
-    if(section === 'All') document.getElementById('stat-all').classList.add('active');
-    else {
-        const id = section.split(' ')[0].toLowerCase();
-        document.getElementById(`stat-${id}`).classList.add('active');
-    }
     render();
 }
 
 function sortTable(key) {
     sortDirection *= -1;
-    scouts.sort((a, b) => {
-        let valA = (a[key] || "").toLowerCase();
-        let valB = (b[key] || "").toLowerCase();
-        return valA < valB ? -1 * sortDirection : (valA > valB ? 1 * sortDirection : 0);
-    });
+    scouts.sort((a, b) => (a[key].toLowerCase() < b[key].toLowerCase() ? -1 : 1) * sortDirection);
     render();
-}
-
-function clearDatabase() {
-    if(confirm("DANGER: Delete ALL records?")) { scouts = []; save(); render(); }
 }
 
 function addScout() {
   const reg = document.getElementById("s_reg").value.trim();
   const name = document.getElementById("s_name").value.trim();
   const section = document.getElementById("s_section").value;
+  if (!reg || !name || !section) return alert("Missing fields");
+  if (scouts.some(s => s.reg === reg)) return alert("Duplicate Reg No");
 
-  if (!reg || !name || !section) return alert("Required: Reg No, Name, Section");
-  if (scouts.some(s => s.reg === reg)) return alert("Reg No already in use.");
-
-  scouts.push({ reg, name, section, troop: document.getElementById("s_troop").value, dob: document.getElementById("s_dob").value, badges: [] });
+  scouts.push({ reg, name, section, troop: document.getElementById("s_troop").value, dob: document.getElementById("s_dob").value, syllabus: [] });
   save(); render();
   ["s_reg","s_name","s_troop","s_dob","s_section"].forEach(id => document.getElementById(id).value = "");
 }
 
-function addBadge() {
+function processAward() {
   const reg = document.getElementById("b_reg").value.trim();
   const scout = scouts.find(s => s.reg === reg);
   if (!scout) return alert("Scout not found!");
-  scout.badges.push({ name: document.getElementById("b_name").value, date: document.getElementById("b_date").value });
-  scout.badges.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  const name = syllabusMode === 'badge' ? document.getElementById("b_name_badge").value : document.getElementById("b_name_award").value;
+  const date = document.getElementById("b_date").value;
+
+  if (!name || !date) return alert("Select item and date");
+
+  // Add item with type for styling
+  scout.syllabus.push({ name, date, type: syllabusMode });
+  scout.syllabus.sort((a,b) => new Date(b.date) - new Date(a.date));
+  
   save(); render();
+  alert("Record Updated!");
 }
 
 function render() {
@@ -211,19 +231,24 @@ function render() {
   const query = document.getElementById("search").value.toLowerCase();
   
   let filtered = scouts;
-  if(currentFilter !== "All") {
-      filtered = filtered.filter(s => s.section === currentFilter);
-  }
+  if(currentFilter !== "All") filtered = filtered.filter(s => s.section === currentFilter);
   filtered = filtered.filter(s => s.reg.toLowerCase().includes(query) || s.name.toLowerCase().includes(query));
 
   filtered.forEach(s => {
     let sectionClass = s.section ? s.section.split(' ')[0].toLowerCase() : "";
+    let itemsHTML = (s.syllabus || []).map(item => `
+        <span class="${item.type === 'award' ? 'award-item' : 'badge-item'}">
+            ${item.name} (${item.date})
+        </span>
+    `).join("");
+
     table.innerHTML += `
       <tr>
         <td><b>${s.reg}</b></td>
         <td><strong>${s.name}</strong> <span class="section-tag ${sectionClass}">${s.section}</span><br><small>${s.troop} | ${s.dob}</small></td>
-        <td>${s.badges.map(b => `<span class="badge-item">${b.name}</span>`).join("")}</td>
-        <td><button class="btn-print" onclick="printScout('${s.reg}')">🖨️</button>${currentUser.role === 'admin' ? `<button class="btn-print" style="background:#ef4444" onclick="deleteScout('${s.reg}')">🗑️</button>` : ""}</td>
+        <td>${itemsHTML || "<i>No records</i>"}</td>
+        <td><button class="btn-print" onclick="printScout('${s.reg}')">🖨️</button>
+        ${currentUser.role === 'admin' ? `<button class="btn-print" style="background:#ef4444" onclick="deleteScout('${s.reg}')">🗑️</button>` : ""}</td>
       </tr>`;
   });
   updateStats();
@@ -235,14 +260,18 @@ function deleteScout(reg) {
 
 function printScout(reg) {
   const s = scouts.find(x => x.reg === reg);
-  document.getElementById("printArea").innerHTML = `<h1>${s.name}</h1><p>${s.section} | Reg: ${s.reg}</p>`;
+  const rows = s.syllabus.map(i => `<li>[${i.type.toUpperCase()}] ${i.name} - ${i.date}</li>`).join("");
+  document.getElementById("printArea").innerHTML = `<h1>${s.name}</h1><p>${s.section}</p><ul>${rows}</ul>`;
   window.print();
 }
 
 function exportToCSV() {
-  if (!scouts.length) return alert("No data!");
-  let csv = "Reg No,Name,Section,DOB,Troop,Badges\n" + scouts.map(s => `${s.reg},${s.name},${s.section},${s.dob},${s.troop},"${s.badges.map(b => b.name).join('|')}"`).join("\n");
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  let csv = "Reg No,Name,Section,DOB,Syllabus Records\n";
+  scouts.forEach(s => {
+    const sStr = s.syllabus.map(i => `${i.name}(${i.date})`).join(" | ");
+    csv += `${s.reg},${s.name},${s.section},${s.dob},"${sStr}"\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "Scout_Database.csv";
