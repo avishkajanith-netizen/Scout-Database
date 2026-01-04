@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scout Database System Pro</title>
+<title>Scout Database - KADSA</title>
 <style>
   :root { --primary: #2563eb; --secondary: #8b5cf6; --danger: #ef4444; --success: #10b981; --gray: #64748b; }
   body{font-family:'Segoe UI', Tahoma, sans-serif; background:#f4f6f8; padding:20px; line-height:1.6}
@@ -24,8 +24,14 @@
 
   /* Table & Badges */
   table { width:100%; border-collapse:collapse; margin-top:15px; background: white; }
-  th, td { border:1px solid #edf2f7; padding:14px; text-align:left; }
-  th { background:#f8fafc; color:var(--gray); font-size: 12px; text-transform: uppercase; }
+  th, td { border:1px solid #edf2f7; padding:12px; text-align:left; vertical-align: top; }
+  th { background:#f8fafc; color:var(--gray); font-size: 11px; text-transform: uppercase; }
+  
+  /* Details Styling */
+  .scout-name { font-size: 15px; color: #1e293b; display: block; margin-bottom: 2px; }
+  .detail-line { font-size: 12px; color: #475569; display: block; line-height: 1.4; }
+  .label-tag { font-weight: bold; color: var(--primary); font-size: 10px; text-transform: uppercase; }
+
   .badge-item { 
       background:#fef3c7; border:1px solid #fde68a; color:#92400e; 
       padding:4px 10px; border-radius:6px; font-size:11px; margin:2px; 
@@ -46,8 +52,7 @@
 
 <div id="loginPage" class="container" style="max-width: 400px; margin-top: 100px; text-align: center;">
   <h2>Scout Database Login</h2>
-  <p style="font-size: 12px; color: #64748b;">Sign in as <b>admin</b> to edit records.</p>
-  <input id="user" placeholder="Username (admin / entry)">
+  <input id="user" placeholder="Username ">
   <input id="pass" type="password" placeholder="Password">
   <button onclick="handleLogin()">Sign In</button>
 </div>
@@ -55,7 +60,7 @@
 <div id="dashboard" class="container hidden">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
     <div>
-        <h2 style="margin:0; color:#1e293b;">Scout Management System</h2>
+        <h2 style="margin:0; color:#1e293b;">Scout Progress System</h2>
         <span id="roleBadge" style="font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #e2e8f0;"></span>
     </div>
     <button onclick="logout()" class="btn-danger btn-nav">Logout</button>
@@ -80,7 +85,7 @@
       <input id="awd_reg" placeholder="Enter Reg No">
       <div style="display:flex; gap:5px; margin-bottom:10px;">
         <button id="t1" onclick="switchAwd('B')" style="background:var(--secondary)">Badges</button>
-        <button id="t2" onclick="switchAwd('C')" style="background:var(--gray)">Awards</button>
+        <button id="t2" onclick="switchAwd('C')" style="background:var(--gray)">Core Awards</button>
       </div>
       <div id="b_search_box">
         <input id="b_find" placeholder="🔍 Search Badge..." onkeyup="filterBadges()">
@@ -88,7 +93,7 @@
         <select id="b_list" size="3" ondblclick="autoFillBadge()"></select>
       </div>
       <select id="c_list" class="hidden">
-        <option>Membership Badge</option><option>Happy</option><option>Winner</option><option>Bronze Star</option><option>Silver Star</option><option>Gold Star</option><option>Scout Award</option><option>CC Award</option><option>CC Challenge</option><option>PM Award</option><option>President Award</option><option>Rover Ideals</option><option>Good Citizen</option><option>BP Award</option>
+        <option>Membership Badge</option><option>Bronze Award</option><option>Silver Award</option><option>Gold Award</option><option>President Award</option>
       </select>
       <input type="date" id="awd_date">
       <button onclick="award()" style="background:var(--secondary)">🎖️ Add Achievement</button>
@@ -102,7 +107,12 @@
   
   <table>
     <thead>
-      <tr><th>Reg No</th><th>Details</th><th>Achievements</th><th class="no-print">Actions</th></tr>
+      <tr>
+        <th style="width: 120px;">Reg No</th>
+        <th style="width: 300px;">Scout Details</th>
+        <th>Achievements</th>
+        <th class="no-print" style="width: 150px;">Actions</th>
+      </tr>
     </thead>
     <tbody id="tableBody"></tbody>
   </table>
@@ -111,11 +121,15 @@
 <div id="pModal" class="modal-overlay hidden">
   <div class="modal-content">
     <h3>Edit Scout Profile</h3>
+    <label class="label-tag">Full Name</label>
     <input id="e_name" placeholder="Name">
+    <label class="label-tag">Section</label>
     <select id="e_sec">
       <option>Sigithi Scout</option><option>Cub Scout</option><option>Scout</option><option>Rover Scout</option>
     </select>
+    <label class="label-tag">Troop</label>
     <input id="e_troop" placeholder="Troop">
+    <label class="label-tag">Date of Birth</label>
     <input id="e_dob" type="date">
     <button onclick="saveP()">Save Changes</button>
     <button onclick="closeAll()" style="background:var(--gray)">Cancel</button>
@@ -134,30 +148,21 @@
 </div>
 
 <script>
-let scouts = JSON.parse(localStorage.getItem("scout_db_v5") || "[]");
+let scouts = JSON.parse(localStorage.getItem("scout_db_v6") || "[]");
 let awdMode = 'B';
 let editState = { reg: null, idx: null };
-let currentUserRole = 'entry'; // 4. Default role
+let currentUserRole = 'entry';
 
-const BADGES = ["J.A./01","J.A./02","J.A./03","J.A./04","J.A./05","J.A./06","J.A./07","J.A./08","J.A./09","J.A./10","J.B./01","J.B./02","J.B./03","J.B./04","J.B./05","J.C./01","J.C./02","J.C./03","J.C./04","J.D./01","J.D./02","J.D./03","J.D./04","J.E./01","J.F./01","J.F./02","J.F./03","J.F./04","J.F./05","J.G./01","J.G./02","J.G./03","J.G./04","J.G./05","J.H./01","J.H./02","J.H./03","J.H./04","J.H./05","J.H./06","J.I./01","J.I./02","J.I./03","J.J./01","J.J./02","J.J./03","J.J./04","J.K./01","J.K./02","J.K./03","J.L./01","J.L./02","J.M./01","S.A./01","S.A./02","S.A./03","S.A./04","S.A./05","S.A./06","S.A./07","S.A./08","S.A./09","S.A./10","S.A./11","S.A./12","S.B./01","S.B./02","S.B./03","S.B./04","S.B./05","S.B./06","S.C./01","S.C./02","S.C./03","S.C./04","S.C./05","S.D./01","S.D./02","S.D./03","S.D./04","S.D./05","S.E./01","S.E./02","S.F./01","S.F./02","S.F./03","S.F./04","S.F./05","S.G./01","S.G./02","S.G./03","S.G./04","S.G./05","S.G./06","S.H./01","S.H./02","S.H./03","S.H./04","S.H./05","S.H./06","S.H./07","S.I./01","S.I./02","S.I./03","S.J./01","S.J./02","S.J./03","S.J./04","S.J./05","S.K./01","S.K./02","S.K./03","S.K./04","S.K./05","S.L./01","S.L./02","S.M./01","Rambler","Scout Craft","Leadership","Project"];
+const BADGES = ["J.A./01","J.A./02","J.A./03","J.A./04","J.A./05","J.A./06","J.A./07","J.A./08","J.A./09","J.A./10","J.B./01","J.B./02","J.B./03","J.B./04","J.B./05","J.C./01","J.C./02","J.C./03","J.C./04","J.D./01","J.D./02","J.D./03","J.D./04","J.E./01","J.F./01","J.F./02","J.F./03","J.F./04","J.F./05","J.G./01","J.G./02","J.G./03","J.G./04","J.G./05","J.H./01","J.H./02","J.H./03","J.H./04","J.H./05","J.H./06","J.I./01","J.I./02","J.I./03","J.J./01","J.J./02","J.J./03","J.J./04","J.K./01","J.K./02","J.K./03","J.L./01","J.L./02","J.M./01","S.A./01","S.A./02","S.A./03","S.A./04","S.A./05","S.A./06","S.A./07","S.A./08","S.A./09","S.A./10","S.A./11","S.A./12","S.B./01","S.B./02","S.B./03","S.B./04","S.B./05","S.B./06","S.C./01","S.C./02","S.C./03","S.C./04","S.C./05","S.D./01","S.D./02","S.D./03","S.D./04","S.D./05","S.E./01","S.E./02","S.F./01","S.F./02","S.F./03","S.F./04","S.F./05","S.G./01","S.G./02","S.G./03","S.G./04","S.G./05","S.G./06","S.H./01","S.H./02","S.H./03","S.H./04","S.H./05","S.H./06","S.H./07","S.I./01","S.I./02","S.I./03","S.J./01","S.J./02","S.J./03","S.J./04","S.J./05","S.K./01","S.K./02","S.K./03","S.K./04","S.K./05","S.L./01","S.L./02","S.M./01"];
 
-// 1. Log out function
-function logout() {
-    location.reload();
-}
+function logout() { location.reload(); }
 
 function handleLogin() {
     const u = document.getElementById("user").value;
     const p = document.getElementById("pass").value;
-    
-    // 4. Admin vs Entry Login Logic
-    if(u === "admin" && p === "admin123") {
-        currentUserRole = 'admin';
-    } else if (u === "entry" && p === "entry123") {
-        currentUserRole = 'entry';
-    } else {
-        return alert("Invalid Credentials");
-    }
+    if(u === "admin" && p === "admin123") currentUserRole = 'admin';
+    else if (u === "entry" && p === "entry123") currentUserRole = 'entry';
+    else return alert("Invalid Credentials");
 
     document.getElementById("loginPage").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
@@ -171,14 +176,8 @@ function loadBadges(f="") {
         let o = document.createElement("option"); o.text = o.value = b; s.add(o);
     });
 }
-
 function filterBadges() { loadBadges(document.getElementById("b_find").value); }
-
-// 3. Double-click auto-fill function
-function autoFillBadge() {
-    const selected = document.getElementById("b_list").value;
-    document.getElementById("b_find").value = selected;
-}
+function autoFillBadge() { document.getElementById("b_find").value = document.getElementById("b_list").value; }
 
 function switchAwd(m) {
     awdMode = m;
@@ -192,7 +191,14 @@ function register() {
     const id = document.getElementById("reg_id").value;
     if(!id) return alert("Enter Reg No");
     if(scouts.find(s=>s.reg===id)) return alert("Duplicate ID");
-    scouts.push({ reg: id, name: document.getElementById("reg_name").value, sec: document.getElementById("reg_sec").value, troop: document.getElementById("reg_troop").value, dob: document.getElementById("reg_dob").value, hist: [] });
+    scouts.push({ 
+        reg: id, 
+        name: document.getElementById("reg_name").value, 
+        sec: document.getElementById("reg_sec").value, 
+        troop: document.getElementById("reg_troop").value, 
+        dob: document.getElementById("reg_dob").value, 
+        hist: [] 
+    });
     sync();
 }
 
@@ -209,7 +215,6 @@ function render() {
     const b = document.getElementById("tableBody"); b.innerHTML = "";
     const q = document.getElementById("mainSearch").value.toLowerCase();
     scouts.filter(s => s.name.toLowerCase().includes(q) || s.reg.includes(q)).forEach(s => {
-        // 4. Check if admin to allow badge editing
         let achievements = s.hist.map((h, i) => `
             <div class="badge-item ${currentUserRole === 'admin' ? 'admin-badge' : ''}" 
                  onclick="${currentUserRole === 'admin' ? `openB('${s.reg}', ${i})` : ''}">
@@ -218,7 +223,12 @@ function render() {
 
         b.innerHTML += `<tr>
             <td><b>${s.reg}</b></td>
-            <td><strong>${s.name}</strong><br><small>${s.sec} | ${s.troop}</small></td>
+            <td>
+                <strong class="scout-name">${s.name}</strong>
+                <span class="detail-line"><span class="label-tag">Section:</span> ${s.sec || 'N/A'}</span>
+                <span class="detail-line"><span class="label-tag">Troop:</span> ${s.troop || 'N/A'}</span>
+                <span class="detail-line"><span class="label-tag">DOB:</span> ${s.dob || 'N/A'}</span>
+            </td>
             <td>${achievements}</td>
             <td class="no-print">
                 ${currentUserRole === 'admin' ? `<button class="btn-nav" style="background:var(--secondary)" onclick="openP('${s.reg}')">📝 Edit</button>` : ''}
@@ -227,24 +237,20 @@ function render() {
     });
 }
 
-// 2. CSV Export Logic
 function exportToCSV() {
-    let csvContent = "data:text/csv;charset=utf-8,Registration No,Name,Section,Troop,DOB,Achievements\n";
+    let csvContent = "data:text/csv;charset=utf-8,Reg No,Name,Section,Troop,DOB,Achievements\n";
     scouts.forEach(s => {
         let achStr = s.hist.map(h => `${h.name} (${h.date})`).join(" | ");
         csvContent += `${s.reg},${s.name},${s.sec},${s.troop},${s.dob},"${achStr}"\n`;
     });
-    const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "scout_database_export.csv");
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", "scout_records.csv");
     document.body.appendChild(link);
     link.click();
 }
 
-// Admin Modal Functions
 function openP(r) {
-    if(currentUserRole !== 'admin') return;
     closeAll();
     const s = scouts.find(x => x.reg === r);
     editState.reg = r;
@@ -265,7 +271,6 @@ function saveP() {
 }
 
 function openB(r, i) {
-    if(currentUserRole !== 'admin') return;
     closeAll();
     editState = { reg: r, idx: i };
     const h = scouts.find(x => x.reg === r).hist[i];
@@ -282,7 +287,7 @@ function saveB() {
 }
 
 function delB() {
-    if(confirm("Permanently delete this badge record?")) {
+    if(confirm("Delete badge?")) {
         scouts.find(x => x.reg === editState.reg).hist.splice(editState.idx, 1);
         sync(); closeAll();
     }
@@ -293,8 +298,7 @@ function closeAll() {
     document.getElementById("bModal").classList.add("hidden");
 }
 
-function sync() { localStorage.setItem("scout_db_v5", JSON.stringify(scouts)); render(); }
+function sync() { localStorage.setItem("scout_db_v6", JSON.stringify(scouts)); render(); }
 </script>
 </body>
 </html>
-
