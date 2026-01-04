@@ -80,7 +80,7 @@
       <input id="awd_reg" placeholder="Enter Reg No">
       <div style="display:flex; gap:5px; margin-bottom:10px;">
         <button id="t1" onclick="switchAwd('B')" style="background:var(--secondary)">Badges</button>
-        <button id="t2" onclick="switchAwd('C')" style="background:var(--gray)">Core Awards</button>
+        <button id="t2" onclick="switchAwd('C')" style="background:var(--gray)">Awards</button>
       </div>
       <div id="b_search_box">
         <input id="b_find" placeholder="🔍 Search Badge..." onkeyup="filterBadges()">
@@ -88,7 +88,7 @@
         <select id="b_list" size="3" ondblclick="autoFillBadge()"></select>
       </div>
       <select id="c_list" class="hidden">
-        <option>Membership Badge</option><option>Bronze Award</option><option>Silver Award</option><option>Gold Award</option><option>President Award</option>
+        <option>Membership Badge</option><option>Happy</option><option>Winner</option><option>Bronze Star</option><option>Silver Star</option><option>Gold Star</option><option>Scout Award</option><option>CC Award</option><option>CC Challenge</option><option>PM Award</option><option>President Award</option><option>Rover Ideals</option><option>Good Citizen</option><option>BP Award</option>
       </select>
       <input type="date" id="awd_date">
       <button onclick="award()" style="background:var(--secondary)">🎖️ Add Achievement</button>
@@ -139,7 +139,7 @@ let awdMode = 'B';
 let editState = { reg: null, idx: null };
 let currentUserRole = 'entry'; // 4. Default role
 
-const BADGES = ["J.A./01","J.A./02","J.A./03","J.A./04","J.A./05","J.A./06","J.A./07","J.A./08","J.A./09","J.A./10","J.B./01","J.B./02","J.B./03","J.B./04","J.B./05","J.C./01","J.C./02","J.C./03","J.C./04","J.D./01","J.D./02","J.D./03","J.D./04","J.E./01","J.F./01","J.F./02","J.F./03","J.F./04","J.F./05","J.G./01","J.G./02","J.G./03","J.G./04","J.G./05","J.H./01","J.H./02","J.H./03","J.H./04","J.H./05","J.H./06","J.I./01","J.I./02","J.I./03","J.J./01","J.J./02","J.J./03","J.J./04","J.K./01","J.K./02","J.K./03","J.L./01","J.L./02","J.M./01","S.A./01","S.A./02","S.A./03","S.A./04","S.A./05","S.A./06","S.A./07","S.A./08","S.A./09","S.A./10","S.A./11","S.A./12","S.B./01","S.B./02","S.B./03","S.B./04","S.B./05","S.B./06","S.C./01","S.C./02","S.C./03","S.C./04","S.C./05","S.D./01","S.D./02","S.D./03","S.D./04","S.D./05","S.E./01","S.E./02","S.F./01","S.F./02","S.F./03","S.F./04","S.F./05","S.G./01","S.G./02","S.G./03","S.G./04","S.G./05","S.G./06","S.H./01","S.H./02","S.H./03","S.H./04","S.H./05","S.H./06","S.H./07","S.I./01","S.I./02","S.I./03","S.J./01","S.J./02","S.J./03","S.J./04","S.J./05","S.K./01","S.K./02","S.K./03","S.K./04","S.K./05","S.L./01","S.L./02","S.M./01"];
+const BADGES = ["J.A./01","J.A./02","J.A./03","J.A./04","J.A./05","J.A./06","J.A./07","J.A./08","J.A./09","J.A./10","J.B./01","J.B./02","J.B./03","J.B./04","J.B./05","J.C./01","J.C./02","J.C./03","J.C./04","J.D./01","J.D./02","J.D./03","J.D./04","J.E./01","J.F./01","J.F./02","J.F./03","J.F./04","J.F./05","J.G./01","J.G./02","J.G./03","J.G./04","J.G./05","J.H./01","J.H./02","J.H./03","J.H./04","J.H./05","J.H./06","J.I./01","J.I./02","J.I./03","J.J./01","J.J./02","J.J./03","J.J./04","J.K./01","J.K./02","J.K./03","J.L./01","J.L./02","J.M./01","S.A./01","S.A./02","S.A./03","S.A./04","S.A./05","S.A./06","S.A./07","S.A./08","S.A./09","S.A./10","S.A./11","S.A./12","S.B./01","S.B./02","S.B./03","S.B./04","S.B./05","S.B./06","S.C./01","S.C./02","S.C./03","S.C./04","S.C./05","S.D./01","S.D./02","S.D./03","S.D./04","S.D./05","S.E./01","S.E./02","S.F./01","S.F./02","S.F./03","S.F./04","S.F./05","S.G./01","S.G./02","S.G./03","S.G./04","S.G./05","S.G./06","S.H./01","S.H./02","S.H./03","S.H./04","S.H./05","S.H./06","S.H./07","S.I./01","S.I./02","S.I./03","S.J./01","S.J./02","S.J./03","S.J./04","S.J./05","S.K./01","S.K./02","S.K./03","S.K./04","S.K./05","S.L./01","S.L./02","S.M./01","Rambler","Scout Craft","Leadership","Project"];
 
 // 1. Log out function
 function logout() {
@@ -297,3 +297,4 @@ function sync() { localStorage.setItem("scout_db_v5", JSON.stringify(scouts)); r
 </script>
 </body>
 </html>
+
