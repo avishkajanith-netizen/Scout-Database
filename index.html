@@ -15,14 +15,12 @@
   .btn-danger{background:#ef4444; width: auto;}
   .hidden{display:none}
   
-  /* Stats Cards */
   .stats-grid{display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:15px; margin-bottom:20px;}
   .stat-card{background:#f1f5f9; padding:15px; border-radius:8px; text-align:center; border-bottom:4px solid #2563eb; cursor:pointer;}
   .stat-card.active{background: #dbeafe; border-bottom-color: #1d4ed8;}
   .stat-card h4{margin:0; font-size:0.9rem; color:#64748b}
   .stat-card p{margin:5px 0 0; font-size:1.5rem; font-weight:bold; color:#1e293b}
 
-  /* Syllabus Tabs */
   .tab-container{display:flex; gap:5px; margin-bottom:10px}
   .tab-btn{background:#e2e8f0; color:#475569; padding:8px; font-size:0.8rem; flex:1}
   .tab-btn.active{background:#8b5cf6; color:white}
@@ -98,18 +96,51 @@
       </div>
 
       <select id="b_name_badge">
-        <option value="">-- Select Proficiency Badge --</option>
-        <option>JA/01 - Scout Craft</option><option>JA/02 - Hiker</option>
-        <option>SA/01 - Fireman</option><option>SB/01 - First Aid</option>
+        <option value="">-- Select Badge Code --</option>
+        <optgroup label="Junior Proficiency (J.A - J.M)">
+            <option>J.A./01</option><option>J.A./02</option><option>J.A./03</option><option>J.A./04</option><option>J.A./05</option><option>J.A./06</option><option>J.A./07</option><option>J.A./08</option><option>J.A./09</option><option>J.A./10</option>
+            <option>J.B./01</option><option>J.B./02</option><option>J.B./03</option><option>J.B./04</option><option>J.B./05</option>
+            <option>J.C./01</option><option>J.C./02</option><option>J.C./03</option><option>J.C./04</option>
+            <option>J.D./01</option><option>J.D./02</option><option>J.D./03</option><option>J.D./04</option>
+            <option>J.E./01</option>
+            <option>J.F./01</option><option>J.F./02</option><option>J.F./03</option><option>J.F./04</option><option>J.F./05</option>
+            <option>J.G./01</option><option>J.G./02</option><option>J.G./03</option><option>J.G./04</option><option>J.G./05</option>
+            <option>J.H./01</option><option>J.H./02</option><option>J.H./03</option><option>J.H./04</option><option>J.H./05</option><option>J.H./06</option>
+            <option>J.I./01</option><option>J.I./02</option><option>J.I./03</option>
+            <option>J.J./01</option><option>J.J./02</option><option>J.J./03</option><option>J.J./04</option>
+            <option>J.K./01</option><option>J.K./02</option><option>J.K./03</option>
+            <option>J.L./01</option><option>J.L./02</option><option>J.M./01</option>
+        </optgroup>
+        <optgroup label="Senior Proficiency (S.A - S.M)">
+            <option>S.A./01</option><option>S.A./02</option><option>S.A./03</option><option>S.A./04</option><option>S.A./05</option><option>S.A./06</option><option>S.A./07</option><option>S.A./08</option><option>S.A./09</option><option>S.A./10</option><option>S.A./11</option><option>S.A./12</option>
+            <option>S.B./01</option><option>S.B./02</option><option>S.B./03</option><option>S.B./04</option><option>S.B./05</option><option>S.B./06</option>
+            <option>S.C./01</option><option>S.C./02</option><option>S.C./03</option><option>S.C./04</option><option>S.C./05</option>
+            <option>S.D./01</option><option>S.D./02</option><option>S.D./03</option><option>S.D./04</option><option>S.D./05</option>
+            <option>S.E./01</option><option>S.E./02</option>
+            <option>S.F./01</option><option>S.F./02</option><option>S.F./03</option><option>S.F./04</option><option>S.F./05</option>
+            <option>S.G./01</option><option>S.G./02</option><option>S.G./03</option><option>S.G./04</option><option>S.G./05</option><option>S.G./06</option>
+            <option>S.H./01</option><option>S.H./02</option><option>S.H./03</option><option>S.H./04</option><option>S.H./05</option><option>S.H./06</option><option>S.H./07</option>
+            <option>S.I./01</option><option>S.I./02</option><option>S.I./03</option>
+            <option>S.J./01</option><option>S.J./02</option><option>S.J./03</option><option>S.J./04</option><option>S.J./05</option>
+            <option>S.K./01</option><option>S.K./02</option><option>S.K./03</option><option>S.K./04</option><option>S.K./05</option>
+            <option>S.L./01</option><option>S.L./02</option><option>S.M./01</option>
+        </optgroup>
       </select>
 
       <select id="b_name_award" class="hidden">
         <option value="">-- Select Core Award --</option>
         <option>Membership Badge</option>
-        <option>Bronze Award</option>
-        <option>Silver Award</option>
-        <option>Gold Award</option>
+        <option>Bronze Star</option>
+        <option>Silver Star</option>
+        <option>Gold Star</option>
+        <option>Happy<option>
+        <option>Winner<option>
+        <option>Scout Award<option>
+        <option>CC Award<option>
+        <option>CC Challenge<option>
+        <option>PM Award<option>
         <option>President Award</option>
+        <option>BP Award</option>
       </select>
 
       <input type="date" id="b_date">
@@ -118,19 +149,13 @@
   </div>
 
   <hr style="margin:25px 0">
-  
-  <div style="display:flex; justify-content:space-between; align-items:center">
-    <h3>Registered Scout Records <span id="filterLabel" style="font-size:0.8rem; color:#2563eb; margin-left:10px"></span></h3>
-    <button onclick="filterBySection('All')" style="width:auto; padding:5px 10px; font-size:0.8rem; background:#64748b">Reset Filters</button>
-  </div>
   <input id="search" placeholder="🔍 Search by Reg No or Name..." onkeyup="render()">
-
   <table>
     <thead>
       <tr>
         <th onclick="sortTable('reg')">Reg No</th>
         <th onclick="sortTable('name')">Scout Details</th>
-        <th>Badges & Awards Earned</th>
+        <th>Badges & Awards</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -144,15 +169,13 @@
 let currentUser = null;
 let scouts = JSON.parse(localStorage.getItem("scouts") || "[]");
 let currentFilter = "All";
-let syllabusMode = 'badge'; // 'badge' or 'award'
-let sortDirection = 1;
+let syllabusMode = 'badge';
 
 const users = {
   admin: { password: "admin123", role: "admin" },
   entry: { password: "entry123", role: "entry" }
 };
 
-/* SYLLABUS TOGGLE LOGIC */
 function toggleSyllabus(mode) {
     syllabusMode = mode;
     document.getElementById('tabBadge').classList.toggle('active', mode === 'badge');
@@ -170,7 +193,7 @@ function login() {
     document.getElementById("dashboard").classList.remove("hidden");
     if(currentUser.role === 'admin') document.getElementById("clearAllBtn").classList.remove("hidden");
     render(); 
-  } else { alert("Invalid Credentials"); }
+  } else { alert("Login Failed"); }
 }
 
 function logout() { location.reload(); }
@@ -184,29 +207,6 @@ function updateStats() {
     document.getElementById("roverCount").innerText = scouts.filter(s => s.section === "Rover Scout").length;
 }
 
-function filterBySection(section) {
-    currentFilter = section;
-    render();
-}
-
-function sortTable(key) {
-    sortDirection *= -1;
-    scouts.sort((a, b) => (a[key].toLowerCase() < b[key].toLowerCase() ? -1 : 1) * sortDirection);
-    render();
-}
-
-function addScout() {
-  const reg = document.getElementById("s_reg").value.trim();
-  const name = document.getElementById("s_name").value.trim();
-  const section = document.getElementById("s_section").value;
-  if (!reg || !name || !section) return alert("Missing fields");
-  if (scouts.some(s => s.reg === reg)) return alert("Duplicate Reg No");
-
-  scouts.push({ reg, name, section, troop: document.getElementById("s_troop").value, dob: document.getElementById("s_dob").value, syllabus: [] });
-  save(); render();
-  ["s_reg","s_name","s_troop","s_dob","s_section"].forEach(id => document.getElementById(id).value = "");
-}
-
 function processAward() {
   const reg = document.getElementById("b_reg").value.trim();
   const scout = scouts.find(s => s.reg === reg);
@@ -215,14 +215,23 @@ function processAward() {
   const name = syllabusMode === 'badge' ? document.getElementById("b_name_badge").value : document.getElementById("b_name_award").value;
   const date = document.getElementById("b_date").value;
 
-  if (!name || !date) return alert("Select item and date");
+  if (!name || !date) return alert("Fill all fields");
 
-  // Add item with type for styling
+  if(!scout.syllabus) scout.syllabus = [];
   scout.syllabus.push({ name, date, type: syllabusMode });
-  scout.syllabus.sort((a,b) => new Date(b.date) - new Date(a.date));
-  
   save(); render();
-  alert("Record Updated!");
+  alert("Success!");
+}
+
+function addScout() {
+  const reg = document.getElementById("s_reg").value.trim();
+  const name = document.getElementById("s_name").value.trim();
+  const section = document.getElementById("s_section").value;
+  if (!reg || !name || !section) return alert("Missing data");
+  if (scouts.some(s => s.reg === reg)) return alert("Reg No exists");
+
+  scouts.push({ reg, name, section, troop: document.getElementById("s_troop").value, dob: document.getElementById("s_dob").value, syllabus: [] });
+  save(); render();
 }
 
 function render() {
@@ -237,16 +246,14 @@ function render() {
   filtered.forEach(s => {
     let sectionClass = s.section ? s.section.split(' ')[0].toLowerCase() : "";
     let itemsHTML = (s.syllabus || []).map(item => `
-        <span class="${item.type === 'award' ? 'award-item' : 'badge-item'}">
-            ${item.name} (${item.date})
-        </span>
+        <span class="${item.type === 'award' ? 'award-item' : 'badge-item'}">${item.name}</span>
     `).join("");
 
     table.innerHTML += `
       <tr>
         <td><b>${s.reg}</b></td>
-        <td><strong>${s.name}</strong> <span class="section-tag ${sectionClass}">${s.section}</span><br><small>${s.troop} | ${s.dob}</small></td>
-        <td>${itemsHTML || "<i>No records</i>"}</td>
+        <td><strong>${s.name}</strong> <span class="section-tag ${sectionClass}">${s.section}</span><br><small>${s.troop}</small></td>
+        <td>${itemsHTML || "None"}</td>
         <td><button class="btn-print" onclick="printScout('${s.reg}')">🖨️</button>
         ${currentUser.role === 'admin' ? `<button class="btn-print" style="background:#ef4444" onclick="deleteScout('${s.reg}')">🗑️</button>` : ""}</td>
       </tr>`;
@@ -254,28 +261,15 @@ function render() {
   updateStats();
 }
 
-function deleteScout(reg) {
-  if (confirm("Delete scout?")) { scouts = scouts.filter(s => s.reg !== reg); save(); render(); }
-}
-
-function printScout(reg) {
-  const s = scouts.find(x => x.reg === reg);
-  const rows = s.syllabus.map(i => `<li>[${i.type.toUpperCase()}] ${i.name} - ${i.date}</li>`).join("");
-  document.getElementById("printArea").innerHTML = `<h1>${s.name}</h1><p>${s.section}</p><ul>${rows}</ul>`;
-  window.print();
-}
-
-function exportToCSV() {
-  let csv = "Reg No,Name,Section,DOB,Syllabus Records\n";
-  scouts.forEach(s => {
-    const sStr = s.syllabus.map(i => `${i.name}(${i.date})`).join(" | ");
-    csv += `${s.reg},${s.name},${s.section},${s.dob},"${sStr}"\n`;
-  });
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "Scout_Database.csv";
-  a.click();
+function filterBySection(sec) { currentFilter = sec; render(); }
+function deleteScout(reg) { if(confirm("Delete?")) { scouts = scouts.filter(s => s.reg !== reg); save(); render(); } }
+function printScout(reg) { window.print(); } 
+function clearDatabase() { if(confirm("Wipe all?")) { scouts=[]; save(); render(); } }
+function exportToCSV() { 
+    let csv = "Reg,Name,Section,Syllabus\n";
+    scouts.forEach(s => csv += `${s.reg},${s.name},${s.section},"${s.syllabus.map(i => i.name).join('|')}"\n`);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "scouts.csv"; a.click();
 }
 </script>
 </body>
