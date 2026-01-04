@@ -10,49 +10,61 @@
   .container{max-width:1200px; margin:auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1)}
   input, select, button { padding:10px; width:100%; margin-bottom:12px; border:1px solid #ddd; border-radius:6px; box-sizing:border-box; font-size: 14px; }
   
-  /* Buttons */
   button { background:var(--primary); color:#fff; border:none; cursor:pointer; font-weight:600; transition: 0.2s; }
-  button:hover { opacity: 0.9; }
+  button:hover { opacity: 0.9; transform: translateY(-1px); }
   .btn-export { background:var(--success); margin-bottom: 20px; width: auto; padding: 10px 20px; display: flex; align-items: center; gap: 8px;}
   .btn-danger { background:var(--danger); }
   .btn-nav { width: auto; padding: 8px 15px; font-size: 13px; }
 
-  /* Layout */
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
-  .box { background:#fff; padding:18px; border-radius:8px; border:1px solid #e5e7eb; }
+  .box { background:#fff; padding:18px; border-radius:8px; border:1px solid #e5e7eb; position: relative; }
   .hidden { display:none !important; }
 
-  /* Table & Badges */
+  /* Table Styling */
   table { width:100%; border-collapse:collapse; margin-top:15px; background: white; }
   th, td { border:1px solid #edf2f7; padding:12px; text-align:left; vertical-align: top; }
   th { background:#f8fafc; color:var(--gray); font-size: 11px; text-transform: uppercase; }
   
-  /* Details Styling */
-  .scout-name { font-size: 15px; color: #1e293b; display: block; margin-bottom: 2px; }
+  .scout-name { font-size: 15px; color: #1e293b; display: block; margin-bottom: 2px; font-weight: bold; }
   .detail-line { font-size: 12px; color: #475569; display: block; line-height: 1.4; }
   .label-tag { font-weight: bold; color: var(--primary); font-size: 10px; text-transform: uppercase; }
 
+  /* Suggestion Box */
+  .suggest-box { 
+    position: absolute; width: calc(100% - 36px); background: white; 
+    border: 1px solid #cbd5e1; border-radius: 6px; z-index: 100; 
+    max-height: 150px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-top: -10px;
+  }
+  .suggest-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+  .suggest-item:hover { background: #f0f7ff; color: var(--primary); }
+
+  /* Badge Bubbles */
   .badge-item { 
       background:#fef3c7; border:1px solid #fde68a; color:#92400e; 
       padding:4px 10px; border-radius:6px; font-size:11px; margin:2px; 
       display:inline-block; transition: 0.2s;
   }
   .admin-badge { cursor: pointer; }
-  .admin-badge:hover { transform: translateY(-2px); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  .admin-badge:hover { background: #fde68a; transform: scale(1.05); }
   .date-sub { display: block; font-size: 9px; opacity: 0.7; border-top: 1px solid rgba(0,0,0,0.05); margin-top: 2px; }
 
-  /* Modal Logic */
-  .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.8); display:flex; align-items:center; justify-content:center; z-index: 9999; }
-  .modal-content { background:white; padding:30px; border-radius:15px; width:450px; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+  /* Modals */
+  .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.85); display:flex; align-items:center; justify-content:center; z-index: 9999; }
+  .modal-content { background:white; padding:30px; border-radius:15px; width:420px; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+
+  #toast { position: fixed; bottom: 20px; right: 20px; background: var(--success); color: white; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: 0.3s; opacity: 0; pointer-events: none; z-index: 10001; }
 
   @media print { .no-print { display: none !important; } }
 </style>
 </head>
 <body>
 
+<div id="toast">Success! Record Updated.</div>
+
 <div id="loginPage" class="container" style="max-width: 400px; margin-top: 100px; text-align: center;">
-  <h2>Scout Database Login</h2>
-  <input id="user" placeholder="Username ">
+  <h2 style="color: var(--primary)">Scout Database Login</h2>
+  <input id="user" placeholder="Username">
   <input id="pass" type="password" placeholder="Password">
   <button onclick="handleLogin()">Sign In</button>
 </div>
@@ -61,14 +73,14 @@
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
     <div>
         <h2 style="margin:0; color:#1e293b;">Scout Progress System</h2>
-        <span id="roleBadge" style="font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #e2e8f0;"></span>
+        <span id="roleBadge" style="font-size: 11px; padding: 2px 10px; border-radius: 12px; background: #e2e8f0; font-weight: bold;"></span>
     </div>
     <button onclick="logout()" class="btn-danger btn-nav">Logout</button>
   </div>
 
   <div class="grid no-print">
     <div class="box">
-      <h3>1. Register Profile</h3>
+      <h3 style="margin-top:0">1. Register Profile</h3>
       <input id="reg_id" placeholder="Registration No">
       <input id="reg_name" placeholder="Full Name">
       <select id="reg_sec">
@@ -77,40 +89,45 @@
       </select>
       <input id="reg_troop" placeholder="Troop Name">
       <input id="reg_dob" type="date">
-      <button onclick="register()">+ Save Scout</button>
+      <button onclick="register()">+ Save Scout Profile</button>
     </div>
 
     <div class="box">
-      <h3>2. Update Record</h3>
-      <input id="awd_reg" placeholder="Enter Reg No">
+      <h3 style="margin-top:0">2. Update Achievement</h3>
+      <input id="awd_reg" placeholder="Type Reg No..." onkeyup="suggestReg(this.value)" autocomplete="off">
+      <div id="regSuggestions" class="suggest-box hidden"></div>
+      
       <div style="display:flex; gap:5px; margin-bottom:10px;">
-        <button id="t1" onclick="switchAwd('B')" style="background:var(--secondary)">Badges</button>
-        <button id="t2" onclick="switchAwd('C')" style="background:var(--gray)">Core Awards</button>
+        <button id="t1" onclick="switchAwd('B')" style="background:var(--secondary); flex:1">Badges</button>
+        <button id="t2" onclick="switchAwd('C')" style="background:var(--gray); flex:1">Core Awards</button>
       </div>
+      
       <div id="b_search_box">
-        <input id="b_find" placeholder="🔍 Search Badge..." onkeyup="filterBadges()">
-        <p style="font-size: 10px; color: var(--gray); margin: 0 0 5px 0;">Double-click code below to select:</p>
+        <input id="b_find" placeholder="🔍 Search Badge Code..." onkeyup="filterBadges()">
         <select id="b_list" size="3" ondblclick="autoFillBadge()"></select>
       </div>
+      
       <select id="c_list" class="hidden">
-        <option>Membership Badge</option><option>Bronze Award</option><option>Silver Award</option><option>Gold Award</option><option>President Award</option>
+        <option value="">-- Select Award --</option>
+        <option>Membership Badge</option><option>Happy</option><option>Winner</option><option>Bronze Star</option><option>Silver Star</option><option>Gold Star</option><option>Scout Award</option><option>CC Award</option><option>CC Challenge</option><option>PM Award</option><option>President Award</option>
       </select>
+      
       <input type="date" id="awd_date">
       <button onclick="award()" style="background:var(--secondary)">🎖️ Add Achievement</button>
     </div>
   </div>
 
-  <div class="no-print" style="display:flex; justify-content: space-between; align-items: center;">
-    <input id="mainSearch" style="width: 70%; margin-bottom: 0;" placeholder="🔍 Search Database..." onkeyup="render()">
-    <button onclick="exportToCSV()" class="btn-export">📊 Export to CSV</button>
+  <div class="no-print" style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <input id="mainSearch" style="width: 70%; margin-bottom: 0;" placeholder="🔍 Filter database by Name or Reg No..." onkeyup="render()">
+    <button onclick="exportToCSV()" class="btn-export">📊 Export Excel (CSV)</button>
   </div>
   
   <table>
     <thead>
       <tr>
-        <th style="width: 120px;">Reg No</th>
-        <th style="width: 300px;">Scout Details</th>
-        <th>Achievements</th>
+        <th style="width: 100px;">Reg No</th>
+        <th style="width: 280px;">Scout Details</th>
+        <th>Achievements / History</th>
         <th class="no-print" style="width: 150px;">Actions</th>
       </tr>
     </thead>
@@ -121,34 +138,31 @@
 <div id="pModal" class="modal-overlay hidden">
   <div class="modal-content">
     <h3>Edit Scout Profile</h3>
-    <label class="label-tag">Full Name</label>
-    <input id="e_name" placeholder="Name">
+    <label class="label-tag">Full Name</label><input id="e_name">
     <label class="label-tag">Section</label>
     <select id="e_sec">
       <option>Sigithi Scout</option><option>Cub Scout</option><option>Scout</option><option>Rover Scout</option>
     </select>
-    <label class="label-tag">Troop</label>
-    <input id="e_troop" placeholder="Troop">
-    <label class="label-tag">Date of Birth</label>
-    <input id="e_dob" type="date">
-    <button onclick="saveP()">Save Changes</button>
+    <label class="label-tag">Troop</label><input id="e_troop">
+    <label class="label-tag">DOB</label><input id="e_dob" type="date">
+    <button onclick="saveP()">Update Details</button>
     <button onclick="closeAll()" style="background:var(--gray)">Cancel</button>
   </div>
 </div>
 
 <div id="bModal" class="modal-overlay hidden">
   <div class="modal-content">
-    <h3>Edit Achievement</h3>
-    <input id="eb_name" placeholder="Badge Name">
-    <input id="eb_date" type="date">
-    <button onclick="saveB()">Apply Changes</button>
-    <button onclick="delB()" class="btn-danger">Delete This Badge</button>
-    <button onclick="closeAll()" style="background:var(--gray); margin-top:5px;">Cancel</button>
+    <h3>Edit Badge Record</h3>
+    <label class="label-tag">Badge Name</label><input id="eb_name">
+    <label class="label-tag">Date Awarded</label><input id="eb_date" type="date">
+    <button onclick="saveB()">Update Badge</button>
+    <button onclick="delB()" class="btn-danger">Delete This Record</button>
+    <button onclick="closeAll()" style="background:var(--gray); margin-top:5px;">Close</button>
   </div>
 </div>
 
 <script>
-let scouts = JSON.parse(localStorage.getItem("scout_db_v6") || "[]");
+let scouts = JSON.parse(localStorage.getItem("scout_db_final") || "[]");
 let awdMode = 'B';
 let editState = { reg: null, idx: null };
 let currentUserRole = 'entry';
@@ -157,17 +171,38 @@ const BADGES = ["J.A./01","J.A./02","J.A./03","J.A./04","J.A./05","J.A./06","J.A
 
 function logout() { location.reload(); }
 
+function showToast() {
+    const t = document.getElementById("toast");
+    t.style.opacity = "1";
+    setTimeout(() => t.style.opacity = "0", 2500);
+}
+
 function handleLogin() {
     const u = document.getElementById("user").value;
     const p = document.getElementById("pass").value;
     if(u === "admin" && p === "admin123") currentUserRole = 'admin';
     else if (u === "entry" && p === "entry123") currentUserRole = 'entry';
-    else return alert("Invalid Credentials");
-
+    else return alert("Invalid Username or Password");
     document.getElementById("loginPage").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
-    document.getElementById("roleBadge").innerText = `Role: ${currentUserRole.toUpperCase()}`;
+    document.getElementById("roleBadge").innerText = `ROLE: ${currentUserRole.toUpperCase()}`;
     loadBadges(); render();
+}
+
+// Auto-Suggest
+function suggestReg(val) {
+    const box = document.getElementById("regSuggestions");
+    if (!val) { box.classList.add("hidden"); return; }
+    const matches = scouts.filter(s => s.reg.toLowerCase().includes(val.toLowerCase()));
+    if (matches.length > 0) {
+        box.innerHTML = matches.map(s => `<div class="suggest-item" ondblclick="fillReg('${s.reg}')"><b>${s.reg}</b> - ${s.name}</div>`).join('');
+        box.classList.remove("hidden");
+    } else box.classList.add("hidden");
+}
+
+function fillReg(reg) {
+    document.getElementById("awd_reg").value = reg;
+    document.getElementById("regSuggestions").classList.add("hidden");
 }
 
 function loadBadges(f="") {
@@ -189,116 +224,77 @@ function switchAwd(m) {
 
 function register() {
     const id = document.getElementById("reg_id").value;
-    if(!id) return alert("Enter Reg No");
-    if(scouts.find(s=>s.reg===id)) return alert("Duplicate ID");
-    scouts.push({ 
-        reg: id, 
-        name: document.getElementById("reg_name").value, 
-        sec: document.getElementById("reg_sec").value, 
-        troop: document.getElementById("reg_troop").value, 
-        dob: document.getElementById("reg_dob").value, 
-        hist: [] 
-    });
+    if(!id) return alert("Registration Number Required");
+    if(scouts.find(s=>s.reg===id)) return alert("Reg No already exists!");
+    scouts.push({ reg: id, name: document.getElementById("reg_name").value, sec: document.getElementById("reg_sec").value, troop: document.getElementById("reg_troop").value, dob: document.getElementById("reg_dob").value, hist: [] });
     sync();
+    // Clear registration fields
+    ['reg_id', 'reg_name', 'reg_sec', 'reg_troop', 'reg_dob'].forEach(i => document.getElementById(i).value = "");
 }
 
 function award() {
-    const s = scouts.find(x => x.reg === document.getElementById("awd_reg").value);
-    const n = awdMode === 'B' ? document.getElementById("b_list").value : document.getElementById("c_list").value;
+    const rInput = document.getElementById("awd_reg");
+    const bInput = document.getElementById("b_find");
+    const s = scouts.find(x => x.reg === rInput.value);
+    const n = awdMode === 'B' ? bInput.value : document.getElementById("c_list").value;
     const d = document.getElementById("awd_date").value;
-    if(!s || !n || !d) return alert("Fill all data correctly");
+    
+    if(!s || !n || !d) return alert("Please select a valid Scout and Achievement");
+    
     s.hist.push({ name: n, date: d });
     sync();
+    showToast();
+    
+    // Auto-clear for fast entry
+    rInput.value = "";
+    bInput.value = "";
+    document.getElementById("awd_date").value = "";
 }
 
 function render() {
     const b = document.getElementById("tableBody"); b.innerHTML = "";
     const q = document.getElementById("mainSearch").value.toLowerCase();
     scouts.filter(s => s.name.toLowerCase().includes(q) || s.reg.includes(q)).forEach(s => {
-        let achievements = s.hist.map((h, i) => `
-            <div class="badge-item ${currentUserRole === 'admin' ? 'admin-badge' : ''}" 
-                 onclick="${currentUserRole === 'admin' ? `openB('${s.reg}', ${i})` : ''}">
-                 ${h.name}<span class="date-sub">${h.date}</span>
-            </div>`).join("");
-
-        b.innerHTML += `<tr>
-            <td><b>${s.reg}</b></td>
-            <td>
-                <strong class="scout-name">${s.name}</strong>
-                <span class="detail-line"><span class="label-tag">Section:</span> ${s.sec || 'N/A'}</span>
-                <span class="detail-line"><span class="label-tag">Troop:</span> ${s.troop || 'N/A'}</span>
-                <span class="detail-line"><span class="label-tag">DOB:</span> ${s.dob || 'N/A'}</span>
-            </td>
-            <td>${achievements}</td>
-            <td class="no-print">
-                ${currentUserRole === 'admin' ? `<button class="btn-nav" style="background:var(--secondary)" onclick="openP('${s.reg}')">📝 Edit</button>` : ''}
-                <button class="btn-nav" onclick="window.print()">🖨️ Print</button>
-            </td></tr>`;
+        let h = s.hist.map((ach, i) => `<div class="badge-item ${currentUserRole === 'admin' ? 'admin-badge' : ''}" onclick="${currentUserRole === 'admin' ? `openB('${s.reg}', ${i})` : ''}">${ach.name}<span class="date-sub">${ach.date}</span></div>`).join("");
+        b.innerHTML += `<tr><td><b>${s.reg}</b></td><td><strong class="scout-name">${s.name}</strong><span class="detail-line"><span class="label-tag">Section:</span> ${s.sec || '--'}</span><span class="detail-line"><span class="label-tag">Troop:</span> ${s.troop || '--'}</span><span class="detail-line"><span class="label-tag">DOB:</span> ${s.dob || '--'}</span></td><td>${h || '<i>No records yet</i>'}</td><td class="no-print">${currentUserRole === 'admin' ? `<button class="btn-nav" style="background:var(--secondary)" onclick="openP('${s.reg}')">📝 Edit</button>` : ''}<button class="btn-nav" onclick="window.print()">🖨️ Print</button></td></tr>`;
     });
 }
 
 function exportToCSV() {
-    let csvContent = "data:text/csv;charset=utf-8,Reg No,Name,Section,Troop,DOB,Achievements\n";
-    scouts.forEach(s => {
-        let achStr = s.hist.map(h => `${h.name} (${h.date})`).join(" | ");
-        csvContent += `${s.reg},${s.name},${s.sec},${s.troop},${s.dob},"${achStr}"\n`;
-    });
-    const link = document.createElement("a");
-    link.setAttribute("href", encodeURI(csvContent));
-    link.setAttribute("download", "scout_records.csv");
-    document.body.appendChild(link);
-    link.click();
+    let csv = "data:text/csv;charset=utf-8,Reg No,Name,Section,Troop,DOB,Achievements\n";
+    scouts.forEach(s => csv += `${s.reg},${s.name},${s.sec},${s.troop},${s.dob},"${s.hist.map(h => `${h.name} (${h.date})`).join(" | ")}"\n`);
+    const link = document.createElement("a"); link.setAttribute("href", encodeURI(csv)); link.setAttribute("download", "Scout_Records_Full.csv"); document.body.appendChild(link); link.click();
 }
 
 function openP(r) {
-    closeAll();
-    const s = scouts.find(x => x.reg === r);
-    editState.reg = r;
-    document.getElementById("e_name").value = s.name;
-    document.getElementById("e_sec").value = s.sec;
-    document.getElementById("e_troop").value = s.troop;
-    document.getElementById("e_dob").value = s.dob;
+    closeAll(); const s = scouts.find(x => x.reg === r); editState.reg = r;
+    document.getElementById("e_name").value = s.name; document.getElementById("e_sec").value = s.sec;
+    document.getElementById("e_troop").value = s.troop; document.getElementById("e_dob").value = s.dob;
     document.getElementById("pModal").classList.remove("hidden");
 }
 
 function saveP() {
     const s = scouts.find(x => x.reg === editState.reg);
-    s.name = document.getElementById("e_name").value;
-    s.sec = document.getElementById("e_sec").value;
-    s.troop = document.getElementById("e_troop").value;
-    s.dob = document.getElementById("e_dob").value;
+    s.name = document.getElementById("e_name").value; s.sec = document.getElementById("e_sec").value;
+    s.troop = document.getElementById("e_troop").value; s.dob = document.getElementById("e_dob").value;
     sync(); closeAll();
 }
 
 function openB(r, i) {
-    closeAll();
-    editState = { reg: r, idx: i };
-    const h = scouts.find(x => x.reg === r).hist[i];
-    document.getElementById("eb_name").value = h.name;
-    document.getElementById("eb_date").value = h.date;
+    closeAll(); editState = { reg: r, idx: i }; const h = scouts.find(x => x.reg === r).hist[i];
+    document.getElementById("eb_name").value = h.name; document.getElementById("eb_date").value = h.date;
     document.getElementById("bModal").classList.remove("hidden");
 }
 
 function saveB() {
     const h = scouts.find(x => x.reg === editState.reg).hist[editState.idx];
-    h.name = document.getElementById("eb_name").value;
-    h.date = document.getElementById("eb_date").value;
+    h.name = document.getElementById("eb_name").value; h.date = document.getElementById("eb_date").value;
     sync(); closeAll();
 }
 
-function delB() {
-    if(confirm("Delete badge?")) {
-        scouts.find(x => x.reg === editState.reg).hist.splice(editState.idx, 1);
-        sync(); closeAll();
-    }
-}
-
-function closeAll() {
-    document.getElementById("pModal").classList.add("hidden");
-    document.getElementById("bModal").classList.add("hidden");
-}
-
-function sync() { localStorage.setItem("scout_db_v6", JSON.stringify(scouts)); render(); }
+function delB() { if(confirm("Permanently delete this badge record?")) { scouts.find(x => x.reg === editState.reg).hist.splice(editState.idx, 1); sync(); closeAll(); } }
+function closeAll() { document.getElementById("pModal").classList.add("hidden"); document.getElementById("bModal").classList.add("hidden"); }
+function sync() { localStorage.setItem("scout_db_final", JSON.stringify(scouts)); render(); }
 </script>
 </body>
 </html>
