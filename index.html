@@ -11,33 +11,37 @@
   button{background:#2563eb;color:#fff;border:none;cursor:pointer;font-weight:600;transition:0.2s}
   button:hover{background:#1d4ed8}
   .btn-export{background:#10b981; margin-bottom: 20px; width: 100%; display: block;}
-  .btn-print{background:#6366f1;padding:6px 12px;font-size:12px;width:auto;margin-right:5px}
-  .btn-danger{background:#ef4444; width: auto;}
+  .btn-action{padding:6px 10px; font-size:11px; width:auto; margin-right:4px; display:inline-flex; align-items:center; gap:3px}
+  .btn-danger{background:#ef4444;} .btn-warning{background:#f59e0b;} .btn-info{background:#6366f1;}
   .hidden{display:none}
   
+  /* Stats & Tabs */
   .stats-grid{display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:15px; margin-bottom:20px;}
   .stat-card{background:#f1f5f9; padding:15px; border-radius:8px; text-align:center; border-bottom:4px solid #2563eb; cursor:pointer;}
-  .stat-card.active{background: #dbeafe; border-bottom-color: #1d4ed8;}
-  .stat-card h4{margin:0; font-size:0.9rem; color:#64748b}
-  .stat-card p{margin:5px 0 0; font-size:1.5rem; font-weight:bold; color:#1e293b}
-
   .tab-container{display:flex; gap:5px; margin-bottom:10px}
   .tab-btn{background:#e2e8f0; color:#475569; padding:8px; font-size:0.8rem; flex:1}
   .tab-btn.active{background:#8b5cf6; color:white}
 
+  /* Table & Badges */
   table{width:100%; border-collapse:collapse; margin-top:15px}
   th,td{border:1px solid #ddd; padding:12px; text-align:left}
-  th{background:#f1f5f9; color:#475569; cursor:pointer;}
-
-  .badge-item{background:#ebf5ff; border:1px solid #bfdbfe; color:#1e40af; padding:2px 6px; margin:2px; border-radius:4px; font-size:0.75rem; display:inline-block;}
-  .award-item{background:#fef3c7; border:1px solid #fde68a; color:#92400e; padding:2px 6px; margin:2px; border-radius:4px; font-size:0.75rem; display:inline-block; font-weight: bold;}
-  .section-tag{padding:2px 8px; border-radius:12px; font-size:0.7rem; font-weight:bold; text-transform:uppercase; color:#fff; margin-left: 5px;}
+  th{background:#f1f5f9; color:#475569;}
+  .badge-item, .award-item{padding:4px 8px; border-radius:4px; font-size:0.75rem; display:inline-block; margin:2px;}
+  .badge-item{background:#ebf5ff; border:1px solid #bfdbfe; color:#1e40af;}
+  .award-item{background:#fef3c7; border:1px solid #fde68a; color:#92400e; font-weight:bold;}
+  .date-tag{display:block; font-size:0.65rem; opacity:0.8; border-top:1px solid rgba(0,0,0,0.1); margin-top:2px}
+  .section-tag{padding:2px 8px; border-radius:12px; font-size:0.7rem; font-weight:bold; color:#fff; margin-left:5px;}
   .sigithi{background:#f59e0b;} .cub{background:#ef4444;} .scout{background:#10b981;} .rover{background:#6366f1;}
+
+  /* Overlay Modal */
+  #editModal{position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000;}
+  .modal-content{background:white; padding:25px; border-radius:10px; width:400px; max-height:80vh; overflow-y:auto;}
 
   @media print {
     body * { visibility: hidden; }
     #printArea, #printArea * { visibility: visible; }
-    #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 40px; border: 5px solid #2563eb; }
+    #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 40px; }
+    .no-print { display: none !important; }
   }
 </style>
 </head>
@@ -46,28 +50,23 @@
 <div class="container" id="loginBox">
   <h2>Scout Database Login</h2>
   <input id="username" placeholder="Username">
-  <input id="password" type="password" placeholder="Password">
+  <input id="password" type="password" placeholder="Password (admin/entry)">
   <button onclick="login()">Login</button>
 </div>
 
 <div class="container hidden" id="dashboard">
   <div style="display:flex; justify-content:space-between; align-items:center">
-    <h2>Scout Management Dashboard</h2>
-    <div>
-        <button id="clearAllBtn" onclick="clearDatabase()" class="btn-danger hidden" style="margin-right:10px">⚠️ Clear All</button>
-        <button onclick="logout()" class="btn-danger">Logout</button>
-    </div>
-  </div>
-
-  <div class="stats-grid" id="statsGrid">
-    <div class="stat-card" onclick="filterBySection('All')" id="stat-all"><h4>Total</h4><p id="totalCount">0</p></div>
-    <div class="stat-card" onclick="filterBySection('Sigithi Scout')" id="stat-sigithi"><h4>Sigithi</h4><p id="sigithiCount">0</p></div>
-    <div class="stat-card" onclick="filterBySection('Cub Scout')" id="stat-cub"><h4>Cub</h4><p id="cubCount">0</p></div>
-    <div class="stat-card" onclick="filterBySection('Scout')" id="stat-scout"><h4>Scout</h4><p id="scoutCount">0</p></div>
-    <div class="stat-card" onclick="filterBySection('Rover Scout')" id="stat-rover"><h4>Rover</h4><p id="roverCount">0</p></div>
+    <h2>Scout Management Dashboard <small id="userRoleDisplay" style="font-size:12px; color:#666"></small></h2>
+    <button onclick="logout()" class="btn-action btn-danger">Logout</button>
   </div>
   
-  <button class="btn-export" onclick="exportToCSV()">📥 Download All Records (Excel/CSV)</button>
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card" onclick="filterBySection('All')"><h4>Total</h4><p id="totalCount">0</p></div>
+    <div class="stat-card" onclick="filterBySection('Sigithi Scout')"><h4>Sigithi</h4><p id="sigithiCount">0</p></div>
+    <div class="stat-card" onclick="filterBySection('Cub Scout')"><h4>Cub</h4><p id="cubCount">0</p></div>
+    <div class="stat-card" onclick="filterBySection('Scout')"><h4>Scout</h4><p id="scoutCount">0</p></div>
+    <div class="stat-card" onclick="filterBySection('Rover Scout')"><h4>Rover</h4><p id="roverCount">0</p></div>
+  </div>
 
   <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
     <div style="background:#f9fafb; padding:15px; border-radius:8px; border:1px solid #e5e7eb">
@@ -76,10 +75,8 @@
       <input id="s_name" placeholder="Full Name">
       <select id="s_section">
         <option value="">-- Select Section --</option>
-        <option value="Sigithi Scout">Sigithi Scout</option>
-        <option value="Cub Scout">Cub Scout</option>
-        <option value="Scout">Scout</option>
-        <option value="Rover Scout">Rover Scout</option>
+        <option>Sigithi Scout</option><option>Cub Scout</option>
+        <option>Scout</option><option>Rover Scout</option>
       </select>
       <input id="s_troop" placeholder="Troop/Unit Name">
       <input id="s_dob" type="date">
@@ -89,92 +86,86 @@
     <div style="background:#f9fafb; padding:15px; border-radius:8px; border:1px solid #e5e7eb">
       <h3>Step 2: Awarding Syllabus</h3>
       <input id="b_reg" placeholder="Enter Registration No">
-      
       <div class="tab-container">
         <button class="tab-btn active" id="tabBadge" onclick="toggleSyllabus('badge')">Proficiency Badges</button>
         <button class="tab-btn" id="tabAward" onclick="toggleSyllabus('award')">Core Awards</button>
       </div>
-
       <select id="b_name_badge">
-        <option value="">-- Select Badge Code --</option>
-        <optgroup label="Junior Proficiency (J.A - J.M)">
-            <option>J.A./01</option><option>J.A./02</option><option>J.A./03</option><option>J.A./04</option><option>J.A./05</option><option>J.A./06</option><option>J.A./07</option><option>J.A./08</option><option>J.A./09</option><option>J.A./10</option>
-            <option>J.B./01</option><option>J.B./02</option><option>J.B./03</option><option>J.B./04</option><option>J.B./05</option>
-            <option>J.C./01</option><option>J.C./02</option><option>J.C./03</option><option>J.C./04</option>
-            <option>J.D./01</option><option>J.D./02</option><option>J.D./03</option><option>J.D./04</option>
-            <option>J.E./01</option>
-            <option>J.F./01</option><option>J.F./02</option><option>J.F./03</option><option>J.F./04</option><option>J.F./05</option>
-            <option>J.G./01</option><option>J.G./02</option><option>J.G./03</option><option>J.G./04</option><option>J.G./05</option>
-            <option>J.H./01</option><option>J.H./02</option><option>J.H./03</option><option>J.H./04</option><option>J.H./05</option><option>J.H./06</option>
-            <option>J.I./01</option><option>J.I./02</option><option>J.I./03</option>
-            <option>J.J./01</option><option>J.J./02</option><option>J.J./03</option><option>J.J./04</option>
-            <option>J.K./01</option><option>J.K./02</option><option>J.K./03</option>
-            <option>J.L./01</option><option>J.L./02</option><option>J.M./01</option>
-        </optgroup>
-        <optgroup label="Senior Proficiency (S.A - S.M)">
-            <option>S.A./01</option><option>S.A./02</option><option>S.A./03</option><option>S.A./04</option><option>S.A./05</option><option>S.A./06</option><option>S.A./07</option><option>S.A./08</option><option>S.A./09</option><option>S.A./10</option><option>S.A./11</option><option>S.A./12</option>
-            <option>S.B./01</option><option>S.B./02</option><option>S.B./03</option><option>S.B./04</option><option>S.B./05</option><option>S.B./06</option>
-            <option>S.C./01</option><option>S.C./02</option><option>S.C./03</option><option>S.C./04</option><option>S.C./05</option>
-            <option>S.D./01</option><option>S.D./02</option><option>S.D./03</option><option>S.D./04</option><option>S.D./05</option>
-            <option>S.E./01</option><option>S.E./02</option>
-            <option>S.F./01</option><option>S.F./02</option><option>S.F./03</option><option>S.F./04</option><option>S.F./05</option>
-            <option>S.G./01</option><option>S.G./02</option><option>S.G./03</option><option>S.G./04</option><option>S.G./05</option><option>S.G./06</option>
-            <option>S.H./01</option><option>S.H./02</option><option>S.H./03</option><option>S.H./04</option><option>S.H./05</option><option>S.H./06</option><option>S.H./07</option>
-            <option>S.I./01</option><option>S.I./02</option><option>S.I./03</option>
-            <option>S.J./01</option><option>S.J./02</option><option>S.J./03</option><option>S.J./04</option><option>S.J./05</option>
-            <option>S.K./01</option><option>S.K./02</option><option>S.K./03</option><option>S.K./04</option><option>S.K./05</option>
-            <option>S.L./01</option><option>S.L./02</option><option>S.M./01</option>
-        </optgroup>
+        <option value="">-- Select Badge --</option>
+        <option>J.A./01</option><option>J.A./02</option><option>S.A./01</option><option>S.A./02</option>
       </select>
-
       <select id="b_name_award" class="hidden">
-        <option value="">-- Select Core Award --</option>
-        <option>Membership Badge</option>
-        <option>Bronze Star</option>
-        <option>Silver Star</option>
-        <option>Gold Star</option>
-        <option>Happy<option>
-        <option>Winner<option>
-        <option>Scout Award<option>
-        <option>CC Award<option>
-        <option>CC Challenge<option>
-        <option>PM Award<option>
-        <option>President Award</option>
-        <option>BP Award</option>
+        <option value="">-- Select Award --</option>
+        <option>Membership Badge</option><option>Bronze Award</option><option>Silver Award</option><option>Gold Award</option><option>President Award</option>
       </select>
-
       <input type="date" id="b_date">
       <button onclick="processAward()" style="background:#8b5cf6">🎖️ Update Scout Record</button>
     </div>
   </div>
 
-  <hr style="margin:25px 0">
-  <input id="search" placeholder="🔍 Search by Reg No or Name..." onkeyup="render()">
+  <hr>
+  <input id="search" placeholder="🔍 Search by Reg No, Name or Section..." onkeyup="render()">
+  
   <table>
     <thead>
       <tr>
-        <th onclick="sortTable('reg')">Reg No</th>
-        <th onclick="sortTable('name')">Scout Details</th>
+        <th>Reg No</th>
+        <th>Scout Details</th>
         <th>Badges & Awards</th>
-        <th>Actions</th>
+        <th class="no-print">Actions</th>
       </tr>
     </thead>
     <tbody id="table"></tbody>
   </table>
 </div>
 
+<div id="editModal" class="hidden">
+    <div class="modal-content">
+        <h3>Edit Scout Profile</h3>
+        <label>Full Name:</label>
+        <input id="edit_name">
+        <label>Section:</label>
+        <select id="edit_section">
+            <option>Sigithi Scout</option><option>Cub Scout</option><option>Scout</option><option>Rover Scout</option>
+        </select>
+        <label>Troop:</label>
+        <input id="edit_troop">
+        <label>DOB:</label>
+        <input type="date" id="edit_dob">
+        <div style="display:flex; gap:10px; margin-top:10px">
+            <button onclick="saveEdit()" style="flex:1">Save Changes</button>
+            <button onclick="closeModal()" class="btn-danger" style="flex:1">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <div id="printArea" class="hidden"></div>
 
 <script>
-let currentUser = null;
 let scouts = JSON.parse(localStorage.getItem("scouts") || "[]");
-let currentFilter = "All";
 let syllabusMode = 'badge';
+let currentFilter = 'All';
+let currentUser = null;
+let editingReg = null;
 
 const users = {
-  admin: { password: "admin123", role: "admin" },
-  entry: { password: "entry123", role: "entry" }
+    admin: { password: "admin123", role: "admin" },
+    entry: { password: "entry123", role: "entry" }
 };
+
+function login() {
+    const u = document.getElementById("username").value;
+    const p = document.getElementById("password").value;
+    if(users[u] && users[u].password === p) {
+        currentUser = users[u];
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("dashboard").classList.remove("hidden");
+        document.getElementById("userRoleDisplay").innerText = `Logged in as: ${currentUser.role.toUpperCase()}`;
+        render();
+    } else { alert("Invalid login"); }
+}
+
+function logout() { location.reload(); }
 
 function toggleSyllabus(mode) {
     syllabusMode = mode;
@@ -184,20 +175,114 @@ function toggleSyllabus(mode) {
     document.getElementById('b_name_award').classList.toggle('hidden', mode !== 'award');
 }
 
-function login() {
-  const u = document.getElementById("username").value.trim();
-  const p = document.getElementById("password").value.trim();
-  if (users[u] && users[u].password === p) {
-    currentUser = users[u];
-    document.getElementById("loginBox").classList.add("hidden");
-    document.getElementById("dashboard").classList.remove("hidden");
-    if(currentUser.role === 'admin') document.getElementById("clearAllBtn").classList.remove("hidden");
-    render(); 
-  } else { alert("Login Failed"); }
+function save() { localStorage.setItem("scouts", JSON.stringify(scouts)); updateStats(); }
+
+function addScout() {
+    const reg = document.getElementById("s_reg").value;
+    if(scouts.some(s => s.reg === reg)) return alert("Reg No exists");
+    scouts.push({ 
+        reg, name: document.getElementById("s_name").value, 
+        dob: document.getElementById("s_dob").value, 
+        section: document.getElementById("s_section").value, 
+        troop: document.getElementById("s_troop").value, 
+        syllabus: [] 
+    });
+    save(); render();
 }
 
-function logout() { location.reload(); }
-function save() { localStorage.setItem("scouts", JSON.stringify(scouts)); updateStats(); }
+function processAward() {
+    const scout = scouts.find(s => s.reg === document.getElementById("b_reg").value);
+    const name = syllabusMode === 'badge' ? document.getElementById("b_name_badge").value : document.getElementById("b_name_award").value;
+    const date = document.getElementById("b_date").value;
+    if(!scout || !name || !date) return alert("Fill all fields correctly");
+    scout.syllabus.push({ name, date, type: syllabusMode });
+    save(); render();
+}
+
+function render() {
+    const table = document.getElementById("table");
+    table.innerHTML = "";
+    const query = document.getElementById("search").value.toLowerCase();
+
+    scouts.filter(s => s.name.toLowerCase().includes(query) || s.reg.includes(query) || s.section.toLowerCase().includes(query)).forEach(s => {
+        let sectionClass = s.section ? s.section.split(' ')[0].toLowerCase() : "";
+        let itemsHTML = s.syllabus.map((i, index) => `
+            <div class="${i.type === 'award' ? 'award-item' : 'badge-item'}">
+                ${i.name} <span class="date-tag">${i.date}</span>
+                ${currentUser.role === 'admin' ? `<span onclick="removeBadge('${s.reg}', ${index})" style="cursor:pointer; color:red; margin-left:5px">×</span>` : ""}
+            </div>
+        `).join("");
+
+        table.innerHTML += `
+            <tr>
+                <td><b>${s.reg}</b></td>
+                <td>
+                    <strong>${s.name}</strong> <span class="section-tag ${sectionClass}">${s.section}</span><br>
+                    <small>DOB: ${s.dob} | Troop: ${s.troop}</small>
+                </td>
+                <td><div style="display:flex; flex-wrap:wrap">${itemsHTML || 'None'}</div></td>
+                <td class="no-print">
+                    <button class="btn-action btn-info" onclick="printScout('${s.reg}')">🖨️</button>
+                    ${currentUser.role === 'admin' ? `
+                        <button class="btn-action btn-warning" onclick="openEdit('${s.reg}')">✏️</button>
+                        <button class="btn-action btn-danger" onclick="deleteScout('${s.reg}')">🗑️</button>
+                    ` : ""}
+                </td>
+            </tr>`;
+    });
+    updateStats();
+}
+
+// ADMIN FUNCTIONS
+function openEdit(reg) {
+    editingReg = reg;
+    const s = scouts.find(x => x.reg === reg);
+    document.getElementById("edit_name").value = s.name;
+    document.getElementById("edit_section").value = s.section;
+    document.getElementById("edit_troop").value = s.troop;
+    document.getElementById("edit_dob").value = s.dob;
+    document.getElementById("editModal").classList.remove("hidden");
+}
+
+function saveEdit() {
+    const s = scouts.find(x => x.reg === editingReg);
+    s.name = document.getElementById("edit_name").value;
+    s.section = document.getElementById("edit_section").value;
+    s.troop = document.getElementById("edit_troop").value;
+    s.dob = document.getElementById("edit_dob").value;
+    save(); closeModal(); render();
+}
+
+function removeBadge(reg, index) {
+    if(confirm("Remove this badge?")) {
+        scouts.find(s => s.reg === reg).syllabus.splice(index, 1);
+        save(); render();
+    }
+}
+
+function deleteScout(reg) {
+    if(confirm("Delete entire scout profile?")) {
+        scouts = scouts.filter(s => s.reg !== reg);
+        save(); render();
+    }
+}
+
+function closeModal() { document.getElementById("editModal").classList.add("hidden"); }
+
+function printScout(reg) {
+    const s = scouts.find(x => x.reg === reg);
+    const syllabusRows = s.syllabus.map(i => `<tr><td>${i.type.toUpperCase()}</td><td>${i.name}</td><td>${i.date}</td></tr>`).join("");
+    document.getElementById("printArea").innerHTML = `
+        <div style="text-align:center; border:5px solid #2563eb; padding:30px">
+            <h2>SCOUT RECORD: ${s.name}</h2>
+            <p>Reg: ${s.reg} | DOB: ${s.dob} | Section: ${s.section}</p>
+            <table border="1" style="width:100%; border-collapse:collapse; margin-top:20px">
+                <thead><tr style="background:#eee"><th>Type</th><th>Badge/Award</th><th>Date</th></tr></thead>
+                <tbody>${syllabusRows || "<tr><td colspan='3'>No Records</td></tr>"}</tbody>
+            </table>
+        </div>`;
+    window.print();
+}
 
 function updateStats() {
     document.getElementById("totalCount").innerText = scouts.length;
@@ -207,69 +292,9 @@ function updateStats() {
     document.getElementById("roverCount").innerText = scouts.filter(s => s.section === "Rover Scout").length;
 }
 
-function processAward() {
-  const reg = document.getElementById("b_reg").value.trim();
-  const scout = scouts.find(s => s.reg === reg);
-  if (!scout) return alert("Scout not found!");
-
-  const name = syllabusMode === 'badge' ? document.getElementById("b_name_badge").value : document.getElementById("b_name_award").value;
-  const date = document.getElementById("b_date").value;
-
-  if (!name || !date) return alert("Fill all fields");
-
-  if(!scout.syllabus) scout.syllabus = [];
-  scout.syllabus.push({ name, date, type: syllabusMode });
-  save(); render();
-  alert("Success!");
-}
-
-function addScout() {
-  const reg = document.getElementById("s_reg").value.trim();
-  const name = document.getElementById("s_name").value.trim();
-  const section = document.getElementById("s_section").value;
-  if (!reg || !name || !section) return alert("Missing data");
-  if (scouts.some(s => s.reg === reg)) return alert("Reg No exists");
-
-  scouts.push({ reg, name, section, troop: document.getElementById("s_troop").value, dob: document.getElementById("s_dob").value, syllabus: [] });
-  save(); render();
-}
-
-function render() {
-  const table = document.getElementById("table");
-  table.innerHTML = "";
-  const query = document.getElementById("search").value.toLowerCase();
-  
-  let filtered = scouts;
-  if(currentFilter !== "All") filtered = filtered.filter(s => s.section === currentFilter);
-  filtered = filtered.filter(s => s.reg.toLowerCase().includes(query) || s.name.toLowerCase().includes(query));
-
-  filtered.forEach(s => {
-    let sectionClass = s.section ? s.section.split(' ')[0].toLowerCase() : "";
-    let itemsHTML = (s.syllabus || []).map(item => `
-        <span class="${item.type === 'award' ? 'award-item' : 'badge-item'}">${item.name}</span>
-    `).join("");
-
-    table.innerHTML += `
-      <tr>
-        <td><b>${s.reg}</b></td>
-        <td><strong>${s.name}</strong> <span class="section-tag ${sectionClass}">${s.section}</span><br><small>${s.troop}</small></td>
-        <td>${itemsHTML || "None"}</td>
-        <td><button class="btn-print" onclick="printScout('${s.reg}')">🖨️</button>
-        ${currentUser.role === 'admin' ? `<button class="btn-print" style="background:#ef4444" onclick="deleteScout('${s.reg}')">🗑️</button>` : ""}</td>
-      </tr>`;
-  });
-  updateStats();
-}
-
-function filterBySection(sec) { currentFilter = sec; render(); }
-function deleteScout(reg) { if(confirm("Delete?")) { scouts = scouts.filter(s => s.reg !== reg); save(); render(); } }
-function printScout(reg) { window.print(); } 
-function clearDatabase() { if(confirm("Wipe all?")) { scouts=[]; save(); render(); } }
-function exportToCSV() { 
-    let csv = "Reg,Name,Section,Syllabus\n";
-    scouts.forEach(s => csv += `${s.reg},${s.name},${s.section},"${s.syllabus.map(i => i.name).join('|')}"\n`);
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "scouts.csv"; a.click();
+function filterBySection(sec) {
+    currentFilter = sec;
+    render();
 }
 </script>
 </body>
